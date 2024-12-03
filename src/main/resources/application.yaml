@@ -1,0 +1,22 @@
+spring.datasource:
+  url: jdbc:mysql://localhost/MyMeetApp?createDatabaseIfNotExist=true&serverTimezone=UTC
+  username: root
+  password:
+  driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs.path: /api-docs
+  swagger-ui:
+    disable-swagger-default-url: false
+
+spring:
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true
