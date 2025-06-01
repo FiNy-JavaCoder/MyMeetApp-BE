@@ -3,7 +3,7 @@ package MyApp.controllers;
 import MyApp.dto.UserDTO;
 import MyApp.entity.UserEntity;
 import MyApp.enums.GenderType;
-import MyApp.service.UserService;
+import MyApp.service.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +36,12 @@ public class UserController {
     public List<UserEntity> getMales() {
         return userService.findByGender(GenderType.male);
     }
-
+    /*
+    @GetMapping("/all-user-messages")
+    public List<Message> sendMessage(@RequestBody Message msg) {
+        return userService.findByGender(GenderType.male);
+    }
+*/
 
 
 }

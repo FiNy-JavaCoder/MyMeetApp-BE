@@ -1,4 +1,4 @@
-package MyApp.service;
+package MyApp.service.User;
 
 import MyApp.dto.UserDTO;
 import MyApp.dto.mapper.UserMapper;
