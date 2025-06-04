@@ -14,12 +14,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class MessageDTO {
 
-    private Long messageId;
     private Long senderId;
     private Long recipientId;
     private String cntMessage;
-    private int conversationId;
-    private LocalDateTime timeStamp;
+    private String conversationId;
 
 
 

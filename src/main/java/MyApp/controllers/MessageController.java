@@ -1,9 +1,8 @@
 package MyApp.controllers;
 
 import MyApp.dto.MessageDTO;
-import MyApp.dto.UserDTO;
-import MyApp.entity.MessageEntity;
-import MyApp.service.User.Message.MessageService;
+import MyApp.service.Message.MessageService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,8 +25,8 @@ public class MessageController {
         return messageService.getConversationById(conversationId);
     }
     @PostMapping("/msgr-sn")
-    public void sendMessage(@RequestBody MessageDTO messageDTO) {
-        messageService.sendMessage(messageDTO);
+    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageDTO messageDTO) {
+       return messageService.createMessage(messageDTO);
 
     }
 }

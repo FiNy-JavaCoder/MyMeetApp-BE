@@ -1,5 +1,5 @@
 
-package MyApp.service.User.Message;
+package MyApp.service.Message;
 
 import MyApp.dto.MessageDTO;
 
