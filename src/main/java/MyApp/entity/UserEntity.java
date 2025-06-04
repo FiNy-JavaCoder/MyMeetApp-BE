@@ -1,11 +1,15 @@
 package MyApp.entity;
 
+
 import MyApp.enums.GenderType;
 import MyApp.enums.Regions;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.Set;
 import MyApp.dto.mapper.converters.RegionsSetConverter;
+
+
+import java.util.List;
 
 
 @Data
@@ -36,6 +40,7 @@ public class UserEntity {
     @Convert(converter = RegionsSetConverter.class)
     @Column(nullable = false, columnDefinition = "TEXT")
     private Set<Regions> regions;
+
 
     @Column(nullable = false)
     private boolean admin = false;

@@ -1,5 +1,6 @@
 package MyApp.dto;
 
+
 import MyApp.enums.GenderType;
 import MyApp.enums.Regions;
 import lombok.*;
@@ -13,9 +14,8 @@ public class UserDTO {
 
     private String nickName;
     private GenderType gender;
-    private Integer age;
+    private int age;
     private String email;
     private String password;
     private Set<Regions> regions;
-
 }
