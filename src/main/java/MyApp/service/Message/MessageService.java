@@ -56,7 +56,7 @@ public class MessageService implements IMessageService {
             message.setSenderId(messageDTO.getSenderId());
             message.setRecipientId(messageDTO.getRecipientId());
             message.setCntMessage(messageDTO.getCntMessage().trim());
-            message.setConversationId(String.format("%.0f_%.0f", messageDTO.getSenderId(), messageDTO.getRecipientId()));
+            message.setConversationId(String.format("%d_%d", messageDTO.getSenderId(), messageDTO.getRecipientId()));
           MessageEntity savedMessage = messageRepository.save(messageMapper.toEntity(message));
             MessageDTO responseMessageDTO = new MessageDTO();
             responseMessageDTO.setSenderId(sender.getUserId());
