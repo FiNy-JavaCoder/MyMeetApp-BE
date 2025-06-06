@@ -31,10 +31,10 @@ public class MessageEntity {
     private String cntMessage;
 
     @Column(name = "timeStamp", nullable = false)
-    private LocalDateTime timeStamp;
+    private LocalDateTime timeStamp = LocalDateTime.now();
 
-    @Column (name = "conversationId", nullable = false)
-    private int conversationId;
+    @Column (name = "conversationId")
+    private String conversationId;
 
 
 

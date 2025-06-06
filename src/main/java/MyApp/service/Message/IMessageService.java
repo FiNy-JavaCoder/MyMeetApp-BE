@@ -1,5 +1,5 @@
 
-package MyApp.service.User.Message;
+package MyApp.service.Message;
 
 import MyApp.dto.MessageDTO;
 
@@ -9,7 +9,7 @@ public interface IMessageService {
 
     void sendMessage(MessageDTO massageDTO);
 
-    List<MessageDTO> getConversationById(int conversationId);
+    List<MessageDTO> getConversationById(String conversationId);
 
 }
 

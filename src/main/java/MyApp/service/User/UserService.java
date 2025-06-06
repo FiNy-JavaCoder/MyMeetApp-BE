@@ -23,6 +23,7 @@ public class UserService implements IUserService {
     }
 
     public void registerUser(UserDTO userDTO) {
+
         userRepository.save(userMapper.toEntity(userDTO));
     }
 
@@ -31,7 +32,7 @@ public class UserService implements IUserService {
     }
 
     public List<UserEntity> findByGender(GenderType genderType) {
-       return userRepository.findByGender(genderType);
+        return userRepository.findByGender(genderType);
 
     }
 }

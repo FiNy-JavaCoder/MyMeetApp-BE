@@ -1,18 +1,15 @@
 package MyApp.controllers;
 
 import MyApp.dto.MessageDTO;
-import MyApp.dto.UserDTO;
-import MyApp.entity.MessageEntity;
-import MyApp.service.User.Message.MessageService;
+import MyApp.service.Message.MessageService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
+@RequestMapping("/api")
 public class MessageController {
 
     private final MessageService messageService;
@@ -22,12 +19,13 @@ public class MessageController {
     }
 
     @GetMapping("/findConversation-id")
-    public List<MessageDTO> findConversation(@PathVariable int conversationId) {
+    public List<MessageDTO> findConversation(@PathVariable String conversationId) {
         return messageService.getConversationById(conversationId);
     }
+
     @PostMapping("/msgr-sn")
-    public void sendMessage(@RequestBody MessageDTO messageDTO) {
-        messageService.sendMessage(messageDTO);
+    public ResponseEntity<MessageDTO> sendMessage(@RequestBody MessageDTO messageDTO) {
+        return messageService.createMessage(messageDTO);
 
     }
 }
