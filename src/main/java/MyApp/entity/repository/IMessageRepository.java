@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface IMessageRepository extends JpaRepository<MessageEntity, Long> {
 
-    List<MessageEntity> findByConversationId(int conversationId);
+    List<MessageEntity> findByConversationId(String conversationId);
 }

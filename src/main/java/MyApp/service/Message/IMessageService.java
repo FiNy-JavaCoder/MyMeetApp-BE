@@ -9,7 +9,7 @@ public interface IMessageService {
 
     void sendMessage(MessageDTO massageDTO);
 
-    List<MessageDTO> getConversationById(int conversationId);
+    List<MessageDTO> getConversationById(String conversationId);
 
 }
 

@@ -18,7 +18,4 @@ public class MessageDTO {
     private Long recipientId;
     private String cntMessage;
     private String conversationId;
-
-
-
 }
