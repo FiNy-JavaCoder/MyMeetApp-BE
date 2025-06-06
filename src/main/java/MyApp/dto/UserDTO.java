@@ -1,8 +1,11 @@
 package MyApp.dto;
 
+
+import MyApp.enums.GenderType;
+import MyApp.enums.Regions;
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -10,8 +13,9 @@ import java.util.List;
 public class UserDTO {
 
     private String nickName;
-    private Integer age;
+    private GenderType gender;
+    private int age;
     private String email;
     private String password;
-    private List<String> regions;
+    private Set<Regions> regions;
 }
