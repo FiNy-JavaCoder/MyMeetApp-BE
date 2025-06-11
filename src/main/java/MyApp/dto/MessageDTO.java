@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 @Data
@@ -18,4 +19,5 @@ public class MessageDTO {
     private Long recipientId;
     private String cntMessage;
     private String conversationId;
+    private OffsetDateTime timeStamp;
 }

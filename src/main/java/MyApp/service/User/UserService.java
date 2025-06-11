@@ -1,5 +1,6 @@
 package MyApp.service.User;
 
+import MyApp.dto.PrivateUserDTO;
 import MyApp.dto.UserDTO;
 import MyApp.dto.mapper.UserMapper;
 import MyApp.entity.UserEntity;
@@ -22,17 +23,17 @@ public class UserService implements IUserService {
         this.userMapper = userMapper;
     }
 
-    public void registerUser(UserDTO userDTO) {
+    public void registerUser(PrivateUserDTO privateUserDTO) {
 
-        userRepository.save(userMapper.toEntity(userDTO));
+        userRepository.save(userMapper.toEntity(privateUserDTO));
     }
 
     public UserDTO getPerson(Long personId) {
         return userMapper.toDTO(userRepository.getReferenceById(personId));
     }
 
-    public List<UserEntity> findByGender(GenderType genderType) {
-        return userRepository.findByGender(genderType);
+    public List<UserDTO> findByGender(GenderType genderType) {
+        return userMapper.toDTOs(userRepository.findByGender(genderType));
 
     }
 }

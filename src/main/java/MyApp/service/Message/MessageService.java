@@ -2,7 +2,8 @@ package MyApp.service.Message;
 
 import MyApp.dto.MessageDTO;
 import MyApp.dto.mapper.MessageMapper;
-import MyApp.dto.mapper.UserMapper;
+import MyApp.service.ZoneTime.IZoneTimeService;
+import MyApp.service.ZoneTime.ZoneTimeService;
 import MyApp.entity.MessageEntity;
 import MyApp.entity.UserEntity;
 import MyApp.entity.repository.IMessageRepository;
@@ -13,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MessageService implements IMessageService {
@@ -21,25 +21,24 @@ public class MessageService implements IMessageService {
     private final IMessageRepository messageRepository;
     private final IUserRepository userRepository;
     private final MessageMapper messageMapper;
-    private final UserMapper userMapper;
+    private final IZoneTimeService zoneTimeService;
 
     @Autowired
     public MessageService(IMessageRepository messageRepository,
                           MessageMapper messageMapper,
-                          UserMapper userMapper,
-                          IUserRepository userRepository) {
+                          IUserRepository userRepository,
+                          IZoneTimeService zoneTimeService ) {
         this.messageRepository = messageRepository;
         this.messageMapper = messageMapper;
-        this.userMapper = userMapper;
         this.userRepository = userRepository;
+        this.zoneTimeService = zoneTimeService;
     }
 
     public List<MessageDTO> getConversationById(String conversationId) {
-        List<MessageEntity> messageEntities = messageRepository.findByConversationId(conversationId);
-        return messageEntities.stream()
-                .map(messageMapper::toDTO)
-                .collect(Collectors.toList());
+        return messageMapper.toDTOs(messageRepository.findByConversationId(conversationId));
     }
+
+
 
     public void sendMessage(MessageDTO messageDTO) {
         messageRepository.save(messageMapper.toEntity(messageDTO));
@@ -56,7 +55,9 @@ public class MessageService implements IMessageService {
         messageEntity.setMsgSender(sender);
         messageEntity.setMsgRecipient(recipient);
         messageEntity.setCntMessage(messageDTO.getCntMessage().trim());
-        messageEntity.setConversationId(generateCanonicalConversationId(messageDTO.getSenderId(), messageDTO.getRecipientId()));
+        messageEntity.setTimeStamp(zoneTimeService.setZoneTime("Europe/Prague"));
+        messageEntity.setConversationId(generateCanonicalConversationId(messageDTO.getSenderId(),
+                                                                        messageDTO.getRecipientId()));
         MessageEntity savedMessageEntity = messageRepository.save(messageEntity);
         MessageDTO responseMessageDTO = messageMapper.toDTO(savedMessageEntity);
 
@@ -69,6 +70,4 @@ public class MessageService implements IMessageService {
             return String.format("%d_%d", id2, id1);
         }
     }
-
-//X
 }

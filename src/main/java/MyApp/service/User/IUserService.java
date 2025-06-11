@@ -1,5 +1,6 @@
 package MyApp.service.User;
 
+import MyApp.dto.PrivateUserDTO;
 import MyApp.dto.UserDTO;
 import MyApp.entity.UserEntity;
 import MyApp.enums.GenderType;
@@ -11,7 +12,7 @@ public interface IUserService {
 
     UserDTO getPerson(Long personId);
 
-    List<UserEntity> findByGender(GenderType genderType);
+    List<UserDTO> findByGender(GenderType genderType);
 
-    void registerUser(UserDTO userDTO);
+    void registerUser(PrivateUserDTO privateUserDTO);
 }

@@ -12,11 +12,12 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class PrivateUserDTO {
 
     private String nickName;
     private GenderType gender;
     private int age;
     private String email;
+    private String password;
     private Set<Regions> regions;
 }

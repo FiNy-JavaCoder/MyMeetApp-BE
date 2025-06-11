@@ -9,9 +9,6 @@ import java.util.Set;
 import MyApp.dto.mapper.converters.RegionsSetConverter;
 
 
-import java.util.List;
-
-
 @Data
 @Entity(name = "person")
 public class UserEntity {
@@ -45,7 +42,7 @@ public class UserEntity {
     @Column(nullable = false)
     private boolean admin = false;
 
-    @Column(nullable = true)
+    @Column
     private String profilePictureUrl;
 
 }

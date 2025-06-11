@@ -5,9 +5,8 @@ import MyApp.enums.GenderType;
 import MyApp.enums.Regions;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.time.OffsetDateTime;
 
 
 @Data
@@ -31,7 +30,7 @@ public class MessageEntity {
     private String cntMessage;
 
     @Column(name = "timeStamp", nullable = false)
-    private LocalDateTime timeStamp = LocalDateTime.now();
+    private OffsetDateTime timeStamp;
 
     @Column (name = "conversationId")
     private String conversationId;

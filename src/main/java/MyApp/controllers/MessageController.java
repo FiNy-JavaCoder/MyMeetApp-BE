@@ -18,7 +18,7 @@ public class MessageController {
         this.messageService = messageService;
     }
 
-    @GetMapping("/findConversation-id")
+    @GetMapping("/findConversation-id/{conversationId}")
     public List<MessageDTO> findConversation(@PathVariable String conversationId) {
         return messageService.getConversationById(conversationId);
     }
