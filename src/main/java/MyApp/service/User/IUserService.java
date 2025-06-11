@@ -4,6 +4,7 @@ import MyApp.dto.PrivateUserDTO;
 import MyApp.dto.UserDTO;
 import MyApp.entity.UserEntity;
 import MyApp.enums.GenderType;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface IUserService {
 
     List<UserDTO> findByGender(GenderType genderType);
 
-    void registerUser(PrivateUserDTO privateUserDTO);
+    ResponseEntity<?> registerUser(PrivateUserDTO privateUserDTO);
 }

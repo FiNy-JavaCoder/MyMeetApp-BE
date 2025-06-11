@@ -19,8 +19,8 @@ public class UserController {
 
 
     @PostMapping("/user-rg")
-    public void registerUser(@RequestBody PrivateUserDTO privateUserDTO) {
-        userService.registerUser(privateUserDTO);
+    public ResponseEntity<?> registerUser(@RequestBody PrivateUserDTO privateUserDTO) {
+       return userService.registerUser(privateUserDTO);
 
     }
 
