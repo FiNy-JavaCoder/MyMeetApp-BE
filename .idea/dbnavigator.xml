@@ -163,7 +163,7 @@
           </object-type-filter>
         </object-filters>
       </connection>
-      <connection id="554481f5-542b-4a81-8fa7-ae701bc27a5f" active="true" signed="true">
+      <connection id="554481f5-542b-4a81-8fa7-ae701bc27a5f" active="false" signed="true">
         <database>
           <name value="Connection 1" />
           <description value="" />
