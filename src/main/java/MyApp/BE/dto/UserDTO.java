@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -17,6 +18,7 @@ public class UserDTO {
     private Long userId;
     private String nickName;
     private GenderType gender;
+    private LocalDate birthDate;
     private int age;
     private String email;
     private Set<Regions> regions;

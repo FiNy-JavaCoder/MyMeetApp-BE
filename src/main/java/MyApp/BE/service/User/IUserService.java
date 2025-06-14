@@ -10,7 +10,7 @@ import java.util.List;
 public interface IUserService {
 
 
-    UserDTO getPerson(Long personId);
+    ResponseEntity<?> getPerson(Long personId);
 
     List<UserDTO> findByGender(GenderType genderType);
 

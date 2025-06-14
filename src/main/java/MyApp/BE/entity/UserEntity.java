@@ -5,6 +5,8 @@ import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.Regions;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
 import java.util.Set;
 import MyApp.BE.dto.mapper.converters.RegionsSetConverter;
 
@@ -26,7 +28,7 @@ public class UserEntity {
     private GenderType gender;
 
     @Column(nullable = false)
-    private Integer age;
+    private LocalDate birthDate;
 
     @Column(nullable = false)
     private String email;

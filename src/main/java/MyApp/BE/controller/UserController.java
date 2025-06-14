@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/person-display/{personId}")
-    public UserDTO getPerson(@PathVariable Long personId) {
+    public ResponseEntity<?> getPerson(@PathVariable Long personId) {
         return userService.getPerson(personId);
     }
 

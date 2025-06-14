@@ -9,12 +9,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 import java.util.List;
 
 @Route("x")
 public class MainView extends VerticalLayout {
 
-    // Nyní budeme používat Grid místo VerticalLayout pro seznam osob
     private Grid<UserDTO> userGrid;
 
     private final UserService userService;
@@ -47,6 +47,6 @@ public class MainView extends VerticalLayout {
     }
 
     private void loadUsers() {
-        List<UserDTO> users = userService.findByGender(GenderType.female);
+        List<UserDTO> users = userService.findByGender(GenderType.male);
         userGrid.setItems(users);
 }}
