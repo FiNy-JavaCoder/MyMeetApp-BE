@@ -1,9 +1,8 @@
 package MyApp.FE;
 
 import MyApp.BE.dto.ErrorDTO;
-import MyApp.BE.dto.UserDTO;
+import MyApp.BE.dto.UserProfileDTO;
 import MyApp.BE.dto.mapper.UserMapper;
-import MyApp.BE.entity.UserEntity;
 import MyApp.BE.entity.repository.IUserRepository;
 import MyApp.BE.service.User.UserService;
 import com.vaadin.flow.component.html.H2;
@@ -22,36 +21,28 @@ import org.springframework.http.ResponseEntity;
 public class UserProfileView extends VerticalLayout implements HasUrlParameter<Long> {
 
     private final UserService userService;
-    private final IUserRepository userRepository;
-    private final UserMapper userMapper;
     private Long userId;
 
     private H2 userNameHeader;
     private Paragraph userNickName;
-    private Paragraph userEmail;
     private Paragraph userGender;
     private Paragraph userAge;
     private Paragraph userRegions;
 
     public UserProfileView(@Autowired
-                           UserService userService,
-                           IUserRepository userRepository,
-                           UserMapper userMapper) {
+                           UserService userService) {
         this.userService = userService;
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
         setAlignItems(Alignment.START);
         setJustifyContentMode(JustifyContentMode.START);
         setPadding(true);
 
         userNameHeader = new H2("Načítám profil...");
         userNickName = new Paragraph("Přezdívka: ");
-        userEmail = new Paragraph("Email: ");
         userGender = new Paragraph("Pohlaví: ");
         userAge = new Paragraph("Věk: ");
         userRegions = new Paragraph("Regiony: ");
 
-        add(userNameHeader, userNickName, userEmail, userGender, userAge, userRegions);
+        add(userNameHeader, userNickName, userGender, userAge, userRegions);
     }
 
     @Override
@@ -71,9 +62,9 @@ public class UserProfileView extends VerticalLayout implements HasUrlParameter<L
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             Object body = responseEntity.getBody();
-            if (body instanceof UserDTO) {
-                UserEntity userentity = (UserEntity) body;
-                updateUserProfileUI(userMapper.toDTO(userentity));
+            if (body instanceof UserProfileDTO) {
+                UserProfileDTO userProfileDTO = (UserProfileDTO) body; // Správné přetypování
+                updateUserProfileUI(userProfileDTO);
             } else {
                 displayErrorMessage("Neznámý formát odpovědi pro uživatele s ID " + userId + ".");
                 throw new NotFoundException();
@@ -90,25 +81,22 @@ public class UserProfileView extends VerticalLayout implements HasUrlParameter<L
         }
     }
 
-    private void updateUserProfileUI(UserDTO user) {
-        if (user != null) {
-            userNameHeader.setText("Profil uživatele: " + user.getNickName());
-            userNickName.setText("Přezdívka: " + user.getNickName());
-            userEmail.setText("Email: " + user.getEmail());
-            userGender.setText("Pohlaví: " + user.getGender());
-            userAge.setText("Věk: " + user.getAge());
-            userRegions.setText("Regiony: " + (user.getRegions() != null ? user.getRegions().toString() : "Žádné"));
+    private void updateUserProfileUI(UserProfileDTO userProfileDTO) {
+        if (userProfileDTO != null) {
+            userNameHeader.setText("Profil uživatele: " + userProfileDTO.getNickName());
+            userNickName.setText("Přezdívka: " + userProfileDTO.getNickName());
+            userGender.setText("Pohlaví: " + userProfileDTO.getGender());
+            userAge.setText("Věk: " + userProfileDTO.getAge());
+            userRegions.setText("Regiony: " + (userProfileDTO.getRegions() != null ? userProfileDTO.getRegions().toString() : "Žádné"));
         } else {
             displayErrorMessage("Uživatel nenalezen.");
             throw new NotFoundException();
         }
     }
 
-    // Pomocná metoda pro zobrazení chybové zprávy v UI
     private void displayErrorMessage(String message) {
         userNameHeader.setText("Chyba");
         userNickName.setText(message);
-        userEmail.setText("");
         userGender.setText("");
         userAge.setText("");
         userRegions.setText("");

@@ -3,7 +3,6 @@ package MyApp.BE.dto;
 
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.Regions;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +13,13 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PrivateUserDTO {
+public class UserProfileDTO {
 
+    private Long userId;
     private String nickName;
-    @Email
-    private String email;
-    private String password;
-
+    private GenderType gender;
+    private LocalDate birthDate;
+    private int age;
+    private Set<Regions> regions;
+    private String profilePictureUrl;
 }

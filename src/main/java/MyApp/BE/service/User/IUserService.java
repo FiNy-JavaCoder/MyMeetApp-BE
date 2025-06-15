@@ -1,7 +1,7 @@
 package MyApp.BE.service.User;
 
-import MyApp.BE.dto.PrivateUserDTO;
-import MyApp.BE.dto.UserDTO;
+import MyApp.BE.dto.RegistrationDTO;
+import MyApp.BE.dto.UserProfileDTO;
 import MyApp.BE.enums.GenderType;
 import org.springframework.http.ResponseEntity;
 
@@ -12,7 +12,7 @@ public interface IUserService {
 
     ResponseEntity<?> getPerson(Long personId);
 
-    List<UserDTO> findByGender(GenderType genderType);
+    List<UserProfileDTO> findByGender(GenderType genderType);
 
-    ResponseEntity<?> registerUser(PrivateUserDTO privateUserDTO);
+    ResponseEntity<?> registerUser(RegistrationDTO registrationDTO);
 }

@@ -1,10 +1,11 @@
 package MyApp.BE.service.User;
 
-import MyApp.BE.dto.ErrorDTO;
-import MyApp.BE.dto.PrivateUserDTO;
-import MyApp.BE.dto.UserDTO;
+import MyApp.BE.dto.*;
 import MyApp.BE.dto.mapper.UserMapper;
+import MyApp.BE.dto.mapper.UserProfileMapper;
 import MyApp.BE.entity.UserEntity;
+import MyApp.BE.entity.UserProfileEntity;
+import MyApp.BE.entity.repository.IUserProfileRepository;
 import MyApp.BE.entity.repository.IUserRepository;
 import MyApp.BE.enums.GenderType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,62 +23,76 @@ import java.util.stream.Collectors;
 public class UserService implements IUserService {
 
     private final IUserRepository userRepository;
+    private final IUserProfileRepository userProfileRepository;
     private final UserMapper userMapper;
+    private final UserProfileMapper userProfileMapper;
 
     @Autowired
-    public UserService(IUserRepository userRepository, UserMapper userMapper) {
+    public UserService(IUserRepository userRepository, IUserProfileRepository userProfileRepository, UserMapper userMapper, UserProfileMapper userProfileMapper) {
         this.userRepository = userRepository;
+        this.userProfileRepository = userProfileRepository;
         this.userMapper = userMapper;
+        this.userProfileMapper = userProfileMapper;
     }
 
-    public ResponseEntity<?> registerUser(PrivateUserDTO privateUserDTO) {
-        if (userRepository.existsByNickName(privateUserDTO.getNickName())) {
+    public ResponseEntity<?> registerUser(RegistrationDTO registrationDTO) {
+        if ((userRepository.existsByNickName(registrationDTO.getNickName())) || userRepository.existsByEmail(registrationDTO.getEmail())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body(new ErrorDTO("Nickname is already taken"));
+                    .body(new ErrorDTO("Nickname or Email is already taken"));
         }
-        PrivateUserDTO newUser = new PrivateUserDTO();
-        newUser.setNickName(privateUserDTO.getNickName());
-        newUser.setEmail(privateUserDTO.getEmail());
-        newUser.setBirthDate(LocalDate.of(privateUserDTO.getBirthYear(),privateUserDTO.getBirthMonth(), 15));
-        newUser.setGender(privateUserDTO.getGender());
-        newUser.setRegions(privateUserDTO.getRegions());
-        newUser.setPassword(privateUserDTO.getPassword());
-        userRepository.save(userMapper.toEntity(newUser));
-        return ResponseEntity.ok("User saved");
+        PrivateUserDTO privateUserDTO = new PrivateUserDTO();
+        privateUserDTO.setNickName(registrationDTO.getNickName());
+        privateUserDTO.setEmail(registrationDTO.getEmail());
+        privateUserDTO.setPassword("");
+        UserEntity userToSave = userMapper.toEntity(privateUserDTO);
+        UserEntity savedUser = userRepository.save(userToSave);
+
+        UserProfileEntity userProfileEntity = new UserProfileEntity();
+        userProfileEntity.setUser(savedUser);
+        userProfileEntity.setGender(registrationDTO.getGender());
+        userProfileEntity.setBirthDate(LocalDate.of(registrationDTO.getBirthYear(), registrationDTO.getBirthMonth(), 15));
+        userProfileEntity.setRegions(registrationDTO.getRegions());
+        userProfileEntity.setProfilePictureUrl("");
+        userProfileRepository.save(userProfileEntity);
+        return ResponseEntity.ok("User and its profile saved");
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> getPerson(Long personId) {
-        if (!userRepository.existsById(personId)) {
+    public ResponseEntity<?> getPerson(Long userId) {
+        if (!userRepository.existsById(userId)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorDTO("User with this ID does not exists"));
         }
-        UserDTO entityUserDTO = userMapper.toDTO(userRepository.getReferenceById(personId));
-        UserDTO newUserDTO = new UserDTO();
-        newUserDTO.setUserId(entityUserDTO.getUserId());
-        newUserDTO.setNickName(entityUserDTO.getNickName());
-        newUserDTO.setGender(entityUserDTO.getGender());
-        newUserDTO.setAge(Period.between(entityUserDTO.getBirthDate(), LocalDate.now()).getYears());
-        newUserDTO.setRegions(entityUserDTO.getRegions());
-        newUserDTO.setBirthDate(null);
-        return new ResponseEntity<>(newUserDTO, HttpStatus.OK);
+        UserProfileDTO entityUserDTO = userProfileMapper.toDTO(userProfileRepository.getReferenceById(userId));
+        UserProfileDTO userProfileDTO = new UserProfileDTO();
+        userProfileDTO.setUserId(entityUserDTO.getUserId());
+        userProfileDTO.setNickName(entityUserDTO.getNickName());
+        userProfileDTO.setGender(entityUserDTO.getGender());
+        userProfileDTO.setAge(Period.between(entityUserDTO.getBirthDate(), LocalDate.now()).getYears());
+        userProfileDTO.setRegions(entityUserDTO.getRegions());
+        userProfileDTO.setBirthDate(null);
+        return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDTO> findByGender(GenderType genderType) {
-        List<UserEntity> userEntities = userRepository.findByGender(genderType);
-        List<UserDTO> userDTOs = userEntities.stream()
-                .map(userEntity -> {
-                    UserDTO userDTO = userMapper.toDTO(userEntity);
-
-                    userDTO.setAge(Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears());
-                    userDTO.setBirthDate(null);
-
-                    return userDTO;
+    public List<UserProfileDTO> findByGender(GenderType genderType) {
+        List<UserProfileEntity> userProfileEntities = userProfileRepository.findByGender(genderType);
+        List<UserProfileDTO> userDTOs = userProfileEntities.stream()
+                .map(userProfileEntity  -> {
+                    UserProfileDTO userProfileDTO = userProfileMapper.toDTO(userProfileEntity);
+                    userProfileDTO.setAge(calculateAge(userProfileEntity, userProfileDTO));
+                    userProfileDTO.setBirthDate(null);
+                    return userProfileDTO;
                 })
                 .collect(Collectors.toList());
 
         return userDTOs;
     }
+
+    public int calculateAge(UserProfileEntity userEntity, UserProfileDTO userProfileDTO) {
+        userProfileDTO.setAge(Period.between(userEntity.getBirthDate(), LocalDate.now()).getYears());
+        return userProfileDTO.getAge();
+    }
+
 }

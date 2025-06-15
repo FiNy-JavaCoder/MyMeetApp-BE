@@ -1,7 +1,9 @@
 package MyApp.BE.controller;
 
 import MyApp.BE.dto.PrivateUserDTO;
+import MyApp.BE.dto.RegistrationDTO;
 import MyApp.BE.dto.UserDTO;
+import MyApp.BE.dto.UserProfileDTO;
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.service.User.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,8 @@ public class UserController {
 
 
     @PostMapping("/user-rg")
-    public ResponseEntity<?> registerUser(@RequestBody PrivateUserDTO privateUserDTO) {
-       return userService.registerUser(privateUserDTO);
+    public ResponseEntity<?> registerUser(@RequestBody RegistrationDTO registrationDTO) {
+       return userService.registerUser(registrationDTO);
 
     }
 
@@ -30,14 +32,14 @@ public class UserController {
     }
 
     @GetMapping("/all-females")
-    public ResponseEntity<List<UserDTO>> getFemales() {
-        List<UserDTO> femaleUsers = userService.findByGender(GenderType.female);
+    public ResponseEntity<List<UserProfileDTO>> getFemales() {
+        List<UserProfileDTO> femaleUsers = userService.findByGender(GenderType.female);
         return ResponseEntity.ok(femaleUsers);
     }
 
     @GetMapping("/all-males")
-    public ResponseEntity<List<UserDTO>> getMales() {
-        List<UserDTO> maleUsers = userService.findByGender(GenderType.male);
+    public ResponseEntity<List<UserProfileDTO>> getMales() {
+        List<UserProfileDTO> maleUsers = userService.findByGender(GenderType.male);
         return ResponseEntity.ok(maleUsers);
 
     }

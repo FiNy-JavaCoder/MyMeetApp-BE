@@ -13,7 +13,6 @@ public interface UserMapper {
 
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "admin", ignore = true)
-    @Mapping(target = "profilePictureUrl", ignore = true)
     UserEntity toEntity(PrivateUserDTO dto);
 
     UserDTO toDTO(UserEntity entity);
