@@ -64,7 +64,7 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorDTO("User with this ID does not exists"));
         }
-        UserProfileDTO entityUserDTO = userProfileMapper.toDTO(userProfileRepository.getReferenceById(userId));
+        UserProfileDTO entityUserDTO = userProfileMapper.toDTO(userProfileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User profile not found")));
         UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setUserId(entityUserDTO.getUserId());
         userProfileDTO.setNickName(entityUserDTO.getNickName());
