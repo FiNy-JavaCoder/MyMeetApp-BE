@@ -20,7 +20,7 @@ public class UserEntity {
     @Column(name = "nick_name", nullable = false, unique = true)
     private String nickName;
 
-    @Column(name = "password", nullable = true)
+    @Column(name = "passwordHash", nullable = true)
     private String password;
 
     @Column(name = "is_admin", nullable = false)

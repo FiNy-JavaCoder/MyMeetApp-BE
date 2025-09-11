@@ -4,6 +4,8 @@ package MyApp.BE.entity;
 import MyApp.BE.dto.mapper.converters.RegionsSetConverter;
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.Regions;
+import MyApp.BE.enums.SearchSexualOrientation;
+import MyApp.BE.enums.SearchTypeRelationShip;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -29,14 +31,32 @@ public class UserProfileEntity {
     @Column(name = "gender", nullable = false)
     private GenderType gender;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sexual_orientation", nullable = false)
+    private SearchSexualOrientation sexualOrientation;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "search_type_relationship", nullable = false)
+    private SearchTypeRelationShip searchTypeRelationShip;
+
     @Convert(converter = RegionsSetConverter.class)
     @Column(name = "regions", nullable = false, columnDefinition = "TEXT")
     private Set<Regions> regions;
 
+    @Convert(converter = RegionsSetConverter.class)
+    @Column(name = "districts", nullable = false, columnDefinition = "TEXT")
+    private Set<Regions> districts;
+
     @Column(name = "birth_date", nullable = false)
     LocalDate birthDate;
 
-    @Column(name = "profile_picture_url", nullable = true)
+    @Column(name = "profile_picture_url", nullable = true )
     private String profilePictureUrl;
+
+    @Column (name = "about_me", length = 500, nullable = true)
+    private String aboutMe;
+
+    @Column(name = "favoriteFilter", length = 2000, nullable = true)
+    private String favoriteFilter;
 
 }

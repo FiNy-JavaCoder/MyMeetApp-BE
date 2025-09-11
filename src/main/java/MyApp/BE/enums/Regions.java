@@ -1,19 +1,18 @@
 package MyApp.BE.enums;
 
 public enum Regions {
-    Praha,
-    Stredocesky,
-    Plzensky,
-    Karlovarsky,
-    Ustecky,
-    Liberecky,
-    Kralovehradecky,
-    Pardubicky,
-    Jihocesky,
-    Vysocina,
-    Jihomoravsky,
-    Olomoucky,
-    Zlinsky,
-    Moravskoslezsky
-
+    PRAHA,
+    STREDOCESKY_KRAJ,
+    JIHOCESKY_KRAJ,
+    PLZENSKY_KRAJ,
+    KARLOVARSKY_KRAJ,
+    USTECKY_KRAJ,
+    LIBERECKY_KRAJ,
+    KRALOVEHRADECKY_KRAJ,
+    PARDUBICKY_KRAJ,
+    KRAJ_VYSOCINA,
+    JIHOMORAVSKY_KRAJ,
+    OLOMOUCKY_KRAJ,
+    MORAVSKOSLEZSKY_KRAJ,
+    ZLINSKY_KRAJ
 }

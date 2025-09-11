@@ -3,6 +3,8 @@ package MyApp.BE.dto;
 
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.Regions;
+import MyApp.BE.enums.SearchSexualOrientation;
+import MyApp.BE.enums.SearchTypeRelationShip;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +17,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class UserProfileDTO {
 
-    private Long userId;
-    private String nickName;
-    private GenderType gender;
-    private LocalDate birthDate;
-    private int age;
-    private Set<Regions> regions;
-    private String profilePictureUrl;
+    protected Long userId;
+    protected String nickName;
+    protected GenderType gender;
+    protected SearchSexualOrientation SexualOrientation;
+    protected SearchTypeRelationShip searchTypeRelationShip;
+    protected LocalDate birthDate;
+    protected int age;
+    protected Set<Regions> regions;
+    protected String profilePictureUrl;
+    protected String aboutMe;
 }

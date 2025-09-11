@@ -19,6 +19,6 @@ public class PrivateUserDTO {
     private String nickName;
     @Email
     private String email;
-    private String password;
+    private String passwordHash;
 
 }

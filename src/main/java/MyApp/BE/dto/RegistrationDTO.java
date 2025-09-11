@@ -1,10 +1,7 @@
 package MyApp.BE.dto;
 
 
-import MyApp.BE.enums.GenderType;
-import MyApp.BE.enums.Regions;
-import MyApp.BE.enums.SearchSexualOrientation;
-import MyApp.BE.enums.SearchTypeRelationShip;
+import MyApp.BE.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,9 +17,9 @@ public class RegistrationDTO {
     private String email;
     private int birthMonth;
     private int birthYear;
-    private String password;
+    private String passwordHash;
     private Set<Regions> regions;
-    private GenderType gender;
-    private SearchTypeRelationShip searchTypeRelationShip;
-    private SearchSexualOrientation sexualOrientation;
+    private Set<Districts> districts;
+    private GenderType genderType;
+    private SearchSexualOrientation searchSexualOrientation;
 }

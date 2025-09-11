@@ -44,13 +44,13 @@ public class UserService implements IUserService {
         PrivateUserDTO privateUserDTO = new PrivateUserDTO();
         privateUserDTO.setNickName(registrationDTO.getNickName());
         privateUserDTO.setEmail(registrationDTO.getEmail());
-        privateUserDTO.setPassword("");
+        privateUserDTO.setPasswordHash("");
         UserEntity userToSave = userMapper.toEntity(privateUserDTO);
         UserEntity savedUser = userRepository.save(userToSave);
 
         UserProfileEntity userProfileEntity = new UserProfileEntity();
         userProfileEntity.setUser(savedUser);
-        userProfileEntity.setGender(registrationDTO.getGender());
+        userProfileEntity.setGender(registrationDTO.getGenderType());
         userProfileEntity.setBirthDate(LocalDate.of(registrationDTO.getBirthYear(), registrationDTO.getBirthMonth(), 15));
         userProfileEntity.setRegions(registrationDTO.getRegions());
         userProfileEntity.setProfilePictureUrl("");
