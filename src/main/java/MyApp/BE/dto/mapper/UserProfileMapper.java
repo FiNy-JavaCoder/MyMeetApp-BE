@@ -1,9 +1,8 @@
 package MyApp.BE.dto.mapper;
 
 import MyApp.BE.dto.PrivateUserDTO;
-import MyApp.BE.dto.UserDTO;
 import MyApp.BE.dto.UserProfileDTO;
-import MyApp.BE.entity.UserEntity;
+import MyApp.BE.dto.UserProfilePrivateDTO;
 import MyApp.BE.entity.UserProfileEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -16,9 +15,11 @@ public interface UserProfileMapper {
     @Mapping(target = "userId", ignore = true)
     UserProfileEntity toEntity(PrivateUserDTO dto);
 
-    @Mapping(source = "user.nickName", target = "nickName")
-    UserProfileDTO toDTO(UserProfileEntity userProfileEntity);
+    @Mapping(source = "userId", target = "userId")
+    UserProfileDTO toPublicDTO(UserProfileEntity userProfileEntity);
 
-    List<UserProfileDTO> toDTOs(List<UserProfileEntity> userProfileEntities);
+    @Mapping(source = "userId", target = "userId")
+    UserProfilePrivateDTO toPrivateDTO(UserProfileEntity userProfileEntity);
+
 
 }

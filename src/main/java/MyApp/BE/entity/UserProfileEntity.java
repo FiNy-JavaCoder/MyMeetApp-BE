@@ -2,18 +2,17 @@ package MyApp.BE.entity;
 
 
 import MyApp.BE.dto.mapper.converters.RegionsSetConverter;
-import MyApp.BE.enums.GenderType;
-import MyApp.BE.enums.Regions;
-import MyApp.BE.enums.SearchSexualOrientation;
-import MyApp.BE.enums.SearchTypeRelationShip;
+import MyApp.BE.enums.*;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-
-@Data
+@Getter
+@Setter
 @Entity(name = "user_profile")
 public class UserProfileEntity {
 
@@ -25,7 +24,7 @@ public class UserProfileEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @MapsId
-    private UserEntity user;
+    private UserEntity userEntity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
@@ -45,7 +44,7 @@ public class UserProfileEntity {
 
     @Convert(converter = RegionsSetConverter.class)
     @Column(name = "districts", nullable = false, columnDefinition = "TEXT")
-    private Set<Regions> districts;
+    private Set<Districts> districts;
 
     @Column(name = "birth_date", nullable = false)
     LocalDate birthDate;
@@ -55,8 +54,4 @@ public class UserProfileEntity {
 
     @Column (name = "about_me", length = 500, nullable = true)
     private String aboutMe;
-
-    @Column(name = "favoriteFilter", length = 2000, nullable = true)
-    private String favoriteFilter;
-
 }

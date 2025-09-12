@@ -49,11 +49,8 @@ public class UserService implements IUserService {
         UserEntity savedUser = userRepository.save(userToSave);
 
         UserProfileEntity userProfileEntity = new UserProfileEntity();
-        userProfileEntity.setUser(savedUser);
-        userProfileEntity.setGender(registrationDTO.getGenderType());
+        userProfileEntity.setUserEntity(savedUser);
         userProfileEntity.setBirthDate(LocalDate.of(registrationDTO.getBirthYear(), registrationDTO.getBirthMonth(), 15));
-        userProfileEntity.setRegions(registrationDTO.getRegions());
-        userProfileEntity.setProfilePictureUrl("");
         userProfileRepository.save(userProfileEntity);
         return ResponseEntity.ok("User and its profile saved");
     }
@@ -64,7 +61,7 @@ public class UserService implements IUserService {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ErrorDTO("User with this ID does not exists"));
         }
-        UserProfileDTO entityUserDTO = userProfileMapper.toDTO(userProfileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User profile not found")));
+        UserProfileDTO entityUserDTO = userProfileMapper.toPublicDTO(userProfileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User profile not found")));
         UserProfileDTO userProfileDTO = new UserProfileDTO();
         userProfileDTO.setUserId(entityUserDTO.getUserId());
         userProfileDTO.setNickName(entityUserDTO.getNickName());
@@ -80,7 +77,7 @@ public class UserService implements IUserService {
         List<UserProfileEntity> userProfileEntities = userProfileRepository.findByGender(genderType);
         List<UserProfileDTO> userDTOs = userProfileEntities.stream()
                 .map(userProfileEntity  -> {
-                    UserProfileDTO userProfileDTO = userProfileMapper.toDTO(userProfileEntity);
+                    UserProfileDTO userProfileDTO = userProfileMapper.toPublicDTO(userProfileEntity);
                     userProfileDTO.setAge(calculateAge(userProfileEntity, userProfileDTO));
                     userProfileDTO.setBirthDate(null);
                     return userProfileDTO;

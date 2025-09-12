@@ -15,11 +15,5 @@ public class RegistrationDTO {
 
     private String nickName;
     private String email;
-    private int birthMonth;
-    private int birthYear;
     private String passwordHash;
-    private Set<Regions> regions;
-    private Set<Districts> districts;
-    private GenderType genderType;
-    private SearchSexualOrientation searchSexualOrientation;
 }
