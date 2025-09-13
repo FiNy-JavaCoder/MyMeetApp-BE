@@ -11,6 +11,8 @@ import java.util.List;
 public interface IUserProfileService {
 
 
+
+
     ResponseEntity<UserProfileDTO> getUserPublicProfile(Long personId);
 
     ResponseEntity<UserProfilePrivateDTO> getUserPrivateProfile(Long personId);

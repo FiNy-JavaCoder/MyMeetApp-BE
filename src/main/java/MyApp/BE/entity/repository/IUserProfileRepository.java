@@ -12,4 +12,6 @@ import java.util.List;
 public interface IUserProfileRepository extends JpaRepository<UserProfileEntity, Long> {
 
     List<UserProfileEntity> findByGender(GenderType gender);
+
+
 }

@@ -1,16 +1,13 @@
 package MyApp.BE.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 
 @Getter
 @Setter
 @Entity(name = "person")
 public class UserEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +27,6 @@ public class UserEntity {
     @Column(name = "is_admin", nullable = false)
     private boolean admin = false;
 
-
-
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfileEntity userProfileEntity;
 }

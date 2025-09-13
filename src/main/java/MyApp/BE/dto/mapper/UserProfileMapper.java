@@ -13,7 +13,7 @@ import java.util.List;
 public interface UserProfileMapper {
 
     @Mapping(target = "userId", ignore = true)
-    UserProfileEntity toEntity(PrivateUserDTO dto);
+    UserProfileEntity toEntity(UserProfileDTO dto);
 
     @Mapping(source = "userId", target = "userId")
     UserProfileDTO toPublicDTO(UserProfileEntity userProfileEntity);
