@@ -1,11 +1,9 @@
 package MyApp.BE.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 @Entity(name = "person")
 public class UserEntity {
 
@@ -23,7 +21,6 @@ public class UserEntity {
     @Column(name = "passwordHash", nullable = true)
     private String password;
 
-    @Getter
     @Column(name = "is_admin", nullable = false)
     private boolean admin = false;
 

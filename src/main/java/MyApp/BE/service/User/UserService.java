@@ -4,6 +4,7 @@ import MyApp.BE.dto.*;
 import MyApp.BE.dto.mapper.UserMapper;
 import MyApp.BE.dto.mapper.UserProfileMapper;
 import MyApp.BE.entity.UserEntity;
+import MyApp.BE.entity.UserProfileEntity;
 import MyApp.BE.entity.repository.IUserProfileRepository;
 import MyApp.BE.entity.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,23 +41,14 @@ public class UserService implements IUserService {
         privateUserDTO.setNickName(registrationDTO.getNickName());
         privateUserDTO.setEmail(registrationDTO.getEmail());
         privateUserDTO.setPasswordHash(registrationDTO.getPasswordHash());
-        userRepository.save(userMapper.toEntity(privateUserDTO));
+
+
         UserEntity userToSave = userMapper.toEntity(privateUserDTO);
-        UserEntity savedUser = userRepository.save(userToSave);
-        UserProfileDTO newProfile = new UserProfileDTO();
-        newProfile.setUserId(savedUser.getUserId());
-        newProfile.setDistricts(null);
-        newProfile.setAboutMe(null);
-        newProfile.setNickName(registrationDTO.getNickName());
-        newProfile.setGender(null);
-        newProfile.setProfilePictureUrl(null);
-        newProfile.setBirthMonth(1);
-        newProfile.setBirthYear(1998);
-        newProfile.setTypeRelationShip(null);
-        newProfile.setRegions(null);
-        newProfile.setBirthDate(LocalDate.of(1998, 5, 15));
-        newProfile.setSexualOrientation(null);
-        profileRepository.save(profileMapper.toEntity(newProfile));
+        UserProfileEntity userProfile = new UserProfileEntity();
+        userToSave.setUserProfileEntity(userProfile);
+        userProfile.setUserEntity(userToSave);
+        userRepository.save(userToSave);
+
 
         return ResponseEntity.ok("User and its profile saved");
     }

@@ -3,14 +3,11 @@ package MyApp.BE.entity;
 import MyApp.BE.dto.mapper.converters.RegionsSetConverter;
 import MyApp.BE.enums.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @Entity(name = "user_profile")
 public class UserProfileEntity {
 
