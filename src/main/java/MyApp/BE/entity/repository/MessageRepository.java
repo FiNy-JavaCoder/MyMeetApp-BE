@@ -1,4 +1,4 @@
-package MyApp.BE.repository;
+package MyApp.BE.entity.repository;
 
 import MyApp.BE.entity.MessageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

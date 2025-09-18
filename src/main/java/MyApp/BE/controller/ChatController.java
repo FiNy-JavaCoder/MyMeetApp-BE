@@ -3,7 +3,7 @@ package MyApp.BE.controller;
 import MyApp.BE.dto.ErrorDTO;
 import MyApp.BE.dto.MessageDTO;
 import MyApp.BE.service.ChatService;
-import MyApp.BE.service.ConversationSummaryDTO;
+import MyApp.BE.dto.ConversationSummaryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

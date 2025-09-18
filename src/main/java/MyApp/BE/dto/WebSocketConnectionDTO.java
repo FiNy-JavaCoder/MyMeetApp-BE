@@ -4,11 +4,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.OffsetDateTime;
 
+/**
+ * DTO for connection events
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TypingIndicatorDTO {
+public class WebSocketConnectionDTO {
     private Long userId;
-    private boolean isTyping;
+    private String sessionId;
+    private ConnectionStatus status;
     private OffsetDateTime timestamp;
+    
+    public enum ConnectionStatus {
+        CONNECTED,
+        DISCONNECTED,
+        RECONNECTING
+    }
 }

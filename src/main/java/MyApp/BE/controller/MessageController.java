@@ -1,7 +1,8 @@
 package MyApp.BE.controller;
 
 import MyApp.BE.dto.MessageDTO;
-import MyApp.BE.service.Message.MessageService;
+import MyApp.BE.service.message.MessageService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

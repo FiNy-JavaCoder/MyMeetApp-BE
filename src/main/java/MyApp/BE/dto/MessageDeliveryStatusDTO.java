@@ -1,25 +1,20 @@
 package MyApp.BE.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.OffsetDateTime;
-
+import MyApp.BE.enums.DeliveryStatus;
 /**
- * DTO for WebSocket message transmission
+ * DTO for message delivery status
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebSocketMessageDTO {
+public class MessageDeliveryStatusDTO {
     private Long messageId;
-    private Long senderId;
-    private Long recipientId;
-    private String content;
     private String conversationId;
+    private DeliveryStatus status;
     private OffsetDateTime timestamp;
-    private boolean isRead;
-    private boolean isEdited;
-}
+    private DeliveryStatus deliveryStatus;
 
+}

@@ -1,0 +1,14 @@
+package MyApp.BE.dto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.OffsetDateTime;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ReadStatusDTO {
+    private String conversationId;
+    private Long readByUserId;
+    private OffsetDateTime timestamp;
+}

@@ -1,4 +1,4 @@
-package MyApp.BE.service.Message;
+package MyApp.BE.service.message;
 
 import MyApp.BE.dto.MessageDTO;
 import MyApp.BE.dto.mapper.MessageMapper;
