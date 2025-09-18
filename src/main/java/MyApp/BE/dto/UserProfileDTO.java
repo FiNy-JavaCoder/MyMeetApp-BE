@@ -1,6 +1,5 @@
 package MyApp.BE.dto;
 
-
 import MyApp.BE.enums.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

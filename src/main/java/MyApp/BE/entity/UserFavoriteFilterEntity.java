@@ -22,13 +22,13 @@ public class UserFavoriteFilterEntity {
     @MapsId
     private UserEntity userEntity;
 
-    @Column(name="gender", nullable = true)
+    @Column(name = "gender", nullable = true)
     private GenderType gender;
 
-    @Column(name="sexual_orientation", nullable = true)
+    @Column(name = "sexual_orientation", nullable = true)
     private SearchSexualOrientation sexualOrientation;
 
-    @Column(name="type_relationship", nullable = true)
+    @Column(name = "type_relationship", nullable = true)
     private SearchTypeRelationShip typeRelationShip;
 
     @Column(name = "min_age", nullable = true)

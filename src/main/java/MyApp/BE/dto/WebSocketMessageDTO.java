@@ -22,4 +22,3 @@ public class WebSocketMessageDTO {
     private boolean isRead;
     private boolean isEdited;
 }
-

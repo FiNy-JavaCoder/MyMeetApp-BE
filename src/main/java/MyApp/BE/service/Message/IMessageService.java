@@ -12,4 +12,3 @@ public interface IMessageService {
     List<MessageDTO> getConversationById(String conversationId);
 
 }
-

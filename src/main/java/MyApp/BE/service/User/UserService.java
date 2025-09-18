@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
-
 @Service
 public class UserService implements IUserService {
 
@@ -24,7 +23,8 @@ public class UserService implements IUserService {
     private final UserProfileMapper profileMapper;
 
     @Autowired
-    public UserService(IUserRepository userRepository, IUserProfileRepository profileRepository, UserMapper userMapper, UserProfileMapper profileMapper) {
+    public UserService(IUserRepository userRepository, IUserProfileRepository profileRepository, UserMapper userMapper,
+            UserProfileMapper profileMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.profileRepository = profileRepository;
@@ -32,7 +32,8 @@ public class UserService implements IUserService {
     }
 
     public ResponseEntity<?> registerUser(RegistrationDTO registrationDTO) {
-        if ((userRepository.existsByNickName(registrationDTO.getNickName())) || userRepository.existsByEmail(registrationDTO.getEmail())) {
+        if ((userRepository.existsByNickName(registrationDTO.getNickName()))
+                || userRepository.existsByEmail(registrationDTO.getEmail())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ErrorDTO("Nickname or Email is already taken"));
@@ -42,13 +43,11 @@ public class UserService implements IUserService {
         privateUserDTO.setEmail(registrationDTO.getEmail());
         privateUserDTO.setPasswordHash(registrationDTO.getPasswordHash());
 
-
         UserEntity userToSave = userMapper.toEntity(privateUserDTO);
         UserProfileEntity userProfile = new UserProfileEntity();
         userToSave.setUserProfileEntity(userProfile);
         userProfile.setUserEntity(userToSave);
         userRepository.save(userToSave);
-
 
         return ResponseEntity.ok("User and its profile saved");
     }

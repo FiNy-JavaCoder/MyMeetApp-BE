@@ -24,9 +24,9 @@ public class MessageService implements IMessageService {
 
     @Autowired
     public MessageService(IMessageRepository messageRepository,
-                          MessageMapper messageMapper,
-                          IUserRepository userRepository,
-                          IZoneTimeService zoneTimeService ) {
+            MessageMapper messageMapper,
+            IUserRepository userRepository,
+            IZoneTimeService zoneTimeService) {
         this.messageRepository = messageRepository;
         this.messageMapper = messageMapper;
         this.userRepository = userRepository;
@@ -37,8 +37,6 @@ public class MessageService implements IMessageService {
         return messageMapper.toDTOs(messageRepository.findByConversationId(conversationId));
     }
 
-
-
     public void sendMessage(MessageDTO messageDTO) {
         messageRepository.save(messageMapper.toEntity(messageDTO));
     }
@@ -47,8 +45,10 @@ public class MessageService implements IMessageService {
         if (messageDTO.getCntMessage() == null || messageDTO.getCntMessage().trim().isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        UserEntity sender = userRepository.findById(messageDTO.getSenderId()).orElseThrow(() -> new RuntimeException("Sender not found"));
-        UserEntity recipient = userRepository.findById(messageDTO.getRecipientId()).orElseThrow(() -> new RuntimeException("Recipient not found"));
+        UserEntity sender = userRepository.findById(messageDTO.getSenderId())
+                .orElseThrow(() -> new RuntimeException("Sender not found"));
+        UserEntity recipient = userRepository.findById(messageDTO.getRecipientId())
+                .orElseThrow(() -> new RuntimeException("Recipient not found"));
 
         MessageEntity messageEntity = new MessageEntity();
         messageEntity.setMsgSender(sender);
@@ -56,12 +56,13 @@ public class MessageService implements IMessageService {
         messageEntity.setCntMessage(messageDTO.getCntMessage().trim());
         messageEntity.setTimeStamp(zoneTimeService.setZoneTime("Europe/Prague"));
         messageEntity.setConversationId(generateCanonicalConversationId(messageDTO.getSenderId(),
-                                                                        messageDTO.getRecipientId()));
+                messageDTO.getRecipientId()));
         MessageEntity savedMessageEntity = messageRepository.save(messageEntity);
         MessageDTO responseMessageDTO = messageMapper.toDTO(savedMessageEntity);
 
         return new ResponseEntity<>(responseMessageDTO, HttpStatus.CREATED);
     }
+
     private String generateCanonicalConversationId(Long id1, Long id2) {
         if (id1.compareTo(id2) < 0) {
             return String.format("%d_%d", id1, id2);

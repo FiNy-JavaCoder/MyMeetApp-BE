@@ -2,6 +2,10 @@
 package MyApp.BE.controller;
 
 import MyApp.BE.dto.MessageDTO;
+import MyApp.BE.dto.ReadStatusDTO;
+import MyApp.BE.dto.TypingIndicatorDTO;
+import MyApp.BE.dto.UserStatusDTO;
+
 import MyApp.BE.service.message.ChatService;
 import MyApp.BE.dto.WebSocketNotificationDTO;
 import MyApp.BE.dto.WebSocketMessageDTO;

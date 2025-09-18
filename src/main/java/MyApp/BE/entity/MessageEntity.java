@@ -9,10 +9,10 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "messages", indexes = {
-    @Index(name = "idx_conversation_id", columnList = "conversation_id"),
-    @Index(name = "idx_sender_id", columnList = "sender_id"),
-    @Index(name = "idx_recipient_id", columnList = "recipient_id"),
-    @Index(name = "idx_timestamp", columnList = "time_stamp")
+        @Index(name = "idx_conversation_id", columnList = "conversation_id"),
+        @Index(name = "idx_sender_id", columnList = "sender_id"),
+        @Index(name = "idx_recipient_id", columnList = "recipient_id"),
+        @Index(name = "idx_timestamp", columnList = "time_stamp")
 })
 @Data
 @AllArgsConstructor
@@ -61,9 +61,7 @@ public class MessageEntity {
             // Generate conversation ID based on user IDs (smaller ID first for consistency)
             Long id1 = msgSender.getUserId();
             Long id2 = msgRecipient.getUserId();
-            conversationId = id1 < id2 ? 
-                "conv_" + id1 + "_" + id2 : 
-                "conv_" + id2 + "_" + id1;
+            conversationId = id1 < id2 ? "conv_" + id1 + "_" + id2 : "conv_" + id2 + "_" + id1;
         }
     }
 }

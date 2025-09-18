@@ -1,4 +1,5 @@
 package MyApp.BE.dto;
+
 import java.time.OffsetDateTime;
 
 @lombok.Data

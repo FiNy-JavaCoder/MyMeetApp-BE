@@ -2,10 +2,10 @@ package MyApp.BE.enums;
 
 public enum SearchSexualOrientation {
 
-    HETEROSEXUAL ("heterosexuální"),
-    HOMOSEXUAL ("homosexuální"),
-    BISEXUAL ("bisexuální"),
-    PANSEXUAL ("pansexuální");
+    HETEROSEXUAL("heterosexuální"),
+    HOMOSEXUAL("homosexuální"),
+    BISEXUAL("bisexuální"),
+    PANSEXUAL("pansexuální");
 
     private final String searchSexualType;
 

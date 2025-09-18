@@ -21,8 +21,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserProfileService {
-    //        userProfileEntity.setBirthDate(LocalDate.of(registrationDTO.getBirthYear(), registrationDTO.getBirthMonth(), 15));
-    //        userProfileDTO.setAge(Period.between(entityUserDTO.getBirthDate(), LocalDate.now()).getYears());
+    // userProfileEntity.setBirthDate(LocalDate.of(registrationDTO.getBirthYear(),
+    // registrationDTO.getBirthMonth(), 15));
+    // userProfileDTO.setAge(Period.between(entityUserDTO.getBirthDate(),
+    // LocalDate.now()).getYears());
 
     private final IUserRepository userRepository;
     private final IUserProfileRepository userProfileRepository;
@@ -30,13 +32,13 @@ public class UserProfileService {
     private final UserProfileMapper userProfileMapper;
 
     @Autowired
-    public UserProfileService(IUserRepository userRepository, IUserProfileRepository userProfileRepository, UserMapper userMapper, UserProfileMapper userProfileMapper) {
+    public UserProfileService(IUserRepository userRepository, IUserProfileRepository userProfileRepository,
+            UserMapper userMapper, UserProfileMapper userProfileMapper) {
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
         this.userMapper = userMapper;
         this.userProfileMapper = userProfileMapper;
     }
-
 
     @Transactional(readOnly = true)
     public ResponseEntity<?> getUserPublicProfile(Long userId) {
@@ -55,7 +57,7 @@ public class UserProfileService {
     public List<UserProfileDTO> findProfilesByGender(GenderType genderType) {
         List<UserProfileEntity> userProfileEntities = userProfileRepository.findByGender(genderType);
         List<UserProfileDTO> userDTOs = userProfileEntities.stream()
-                .map(userProfileEntity  -> {
+                .map(userProfileEntity -> {
                     UserProfileDTO userProfileDTO = userProfileMapper.toPublicDTO(userProfileEntity);
                     userProfileDTO.setAge(calculateAge(userProfileEntity, userProfileDTO));
                     return userProfileDTO;
@@ -71,15 +73,16 @@ public class UserProfileService {
     }
 
     public UserProfileDTO findProfile(Long userId) {
-        return userProfileMapper.toPublicDTO(userProfileRepository.findById(userId).orElseThrow(() -> new RuntimeException("User profile not found")));
+        return userProfileMapper.toPublicDTO(userProfileRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User profile not found")));
 
     }
-    /** public UserProfileDTO editUserProfile(Long userId) {
-        UserProfileDTO loadedProfile = findProfile(userId);
-
-        return
-    }
-**/
-
+    /**
+     * public UserProfileDTO editUserProfile(Long userId) {
+     * UserProfileDTO loadedProfile = findProfile(userId);
+     * 
+     * return
+     * }
+     **/
 
 }

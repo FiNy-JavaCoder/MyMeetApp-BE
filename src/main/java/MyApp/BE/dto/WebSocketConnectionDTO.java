@@ -1,4 +1,5 @@
 package MyApp.BE.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class WebSocketConnectionDTO {
     private String sessionId;
     private ConnectionStatus status;
     private OffsetDateTime timestamp;
-    
+
     public enum ConnectionStatus {
         CONNECTED,
         DISCONNECTED,

@@ -25,10 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketEventListener {
 
     private final SimpMessagingTemplate messagingTemplate;
-    
+
     // Track online users
     private final Map<String, String> onlineUsers = new ConcurrentHashMap<>();
-    
+
     // Track user sessions
     private final Map<String, String> sessionUserMap = new ConcurrentHashMap<>();
 
@@ -37,20 +37,20 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         Principal user = headerAccessor.getUser();
-        
+
         if (user != null) {
             String userId = user.getName();
             onlineUsers.put(userId, sessionId);
             sessionUserMap.put(sessionId, userId);
-            
+
             log.info("User {} connected with session {}", userId, sessionId);
-            
+
             // Notify other users that this user is online
             UserStatusNotification notification = new UserStatusNotification();
             notification.setUserId(Long.parseLong(userId));
             notification.setStatus("ONLINE");
             notification.setTimestamp(OffsetDateTime.now());
-            
+
             messagingTemplate.convertAndSend("/topic/user-status", notification);
         }
     }
@@ -60,19 +60,19 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         String userId = sessionUserMap.get(sessionId);
-        
+
         if (userId != null) {
             onlineUsers.remove(userId);
             sessionUserMap.remove(sessionId);
-            
+
             log.info("User {} disconnected from session {}", userId, sessionId);
-            
+
             // Notify other users that this user is offline
             UserStatusNotification notification = new UserStatusNotification();
             notification.setUserId(Long.parseLong(userId));
             notification.setStatus("OFFLINE");
             notification.setTimestamp(OffsetDateTime.now());
-            
+
             messagingTemplate.convertAndSend("/topic/user-status", notification);
         }
     }
@@ -82,10 +82,10 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String destination = headerAccessor.getDestination();
         Principal user = headerAccessor.getUser();
-        
+
         if (user != null && destination != null) {
             log.debug("User {} subscribed to {}", user.getName(), destination);
-            
+
             // If subscribing to a conversation, mark messages as delivered
             if (destination.startsWith("/topic/conversation/")) {
                 String conversationId = extractConversationId(destination);
@@ -100,7 +100,7 @@ public class WebSocketEventListener {
     public void handleSessionUnsubscribeEvent(SessionUnsubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         Principal user = headerAccessor.getUser();
-        
+
         if (user != null) {
             log.debug("User {} unsubscribed", user.getName());
         }
@@ -143,11 +143,10 @@ public class WebSocketEventListener {
         notification.setConversationId(conversationId);
         notification.setDeliveredToUserId(userId);
         notification.setTimestamp(OffsetDateTime.now());
-        
+
         messagingTemplate.convertAndSend(
-            "/topic/conversation/" + conversationId + "/delivery",
-            notification
-        );
+                "/topic/conversation/" + conversationId + "/delivery",
+                notification);
     }
 
     /**

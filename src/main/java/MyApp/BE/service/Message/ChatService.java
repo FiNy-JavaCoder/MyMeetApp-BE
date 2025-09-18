@@ -6,8 +6,8 @@ import MyApp.BE.entity.MessageEntity;
 import MyApp.BE.entity.UserEntity;
 import MyApp.BE.exception.ResourceNotFoundException;
 import MyApp.BE.exception.UnauthorizedException;
-import MyApp.BE.repository.MessageRepository;
-import MyApp.BE.repository.UserRepository;
+import MyApp.BE.entity.repository.IMessageRepository;
+import MyApp.BE.entity.repository.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,21 +27,21 @@ import java.util.stream.Collectors;
 @Transactional
 public class ChatService {
 
-    private final MessageRepository messageRepository;
-    private final UserRepository userRepository;
+    private final IMessageRepository messageRepository;
+    private final IUserRepository userRepository;
     private final MessageMapper messageMapper;
 
     /**
      * Send a new message
      */
     public MessageDTO sendMessage(MessageDTO messageDTO) {
-        log.info("Sending message from user {} to user {}", 
+        log.info("Sending message from user {} to user {}",
                 messageDTO.getSenderId(), messageDTO.getRecipientId());
 
         // Validate sender and recipient exist
         UserEntity sender = userRepository.findById(messageDTO.getSenderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Sender not found"));
-        
+
         UserEntity recipient = userRepository.findById(messageDTO.getRecipientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipient not found"));
 
@@ -58,14 +58,14 @@ public class ChatService {
         // Generate conversation ID if not provided
         if (messageDTO.getConversationId() == null || messageDTO.getConversationId().isEmpty()) {
             messageEntity.setConversationId(generateConversationId(
-                messageDTO.getSenderId(), messageDTO.getRecipientId()));
+                        messageDTO.getSenderId(), messageDTO.getRecipientId()));
         } else {
             messageEntity.setConversationId(messageDTO.getConversationId());
         }
 
         // Save message
         MessageEntity savedMessage = messageRepository.save(messageEntity);
-        
+
         // Convert to DTO and return
         return messageMapper.toDTO(savedMessage);
     }
@@ -75,16 +75,16 @@ public class ChatService {
      */
     public List<MessageDTO> getConversation(Long userId1, Long userId2) {
         log.info("Fetching conversation between users {} and {}", userId1, userId2);
-        
+
         List<MessageEntity> messages = messageRepository.findMessagesBetweenUsers(userId1, userId2);
-        
+
         // Mark messages as read if current user is recipient
         messages.forEach(msg -> {
             if (msg.getMsgRecipient().getUserId().equals(userId1) && !msg.isRead()) {
                 msg.setRead(true);
             }
         });
-        
+
         return messageMapper.toDTOs(messages);
     }
 
@@ -93,25 +93,25 @@ public class ChatService {
      */
     public List<MessageDTO> getMessagesByConversationId(String conversationId, Long requestingUserId) {
         log.info("Fetching messages for conversation {}", conversationId);
-        
+
         List<MessageEntity> messages = messageRepository.findByConversationId(conversationId);
-        
+
         // Verify that requesting user is part of this conversation
         if (!messages.isEmpty()) {
             MessageEntity firstMessage = messages.get(0);
             if (!firstMessage.getMsgSender().getUserId().equals(requestingUserId) &&
-                !firstMessage.getMsgRecipient().getUserId().equals(requestingUserId)) {
+                        !firstMessage.getMsgRecipient().getUserId().equals(requestingUserId)) {
                 throw new UnauthorizedException("You are not authorized to view this conversation");
             }
         }
-        
+
         // Mark messages as read
         messages.forEach(msg -> {
             if (msg.getMsgRecipient().getUserId().equals(requestingUserId) && !msg.isRead()) {
                 msg.setRead(true);
             }
         });
-        
+
         // Filter out deleted messages
         messages = messages.stream()
                 .filter(msg -> {
@@ -122,7 +122,7 @@ public class ChatService {
                     }
                 })
                 .collect(Collectors.toList());
-        
+
         return messageMapper.toDTOs(messages);
     }
 
@@ -131,21 +131,21 @@ public class ChatService {
      */
     public List<ConversationSummaryDTO> getRecentConversations(Long userId) {
         log.info("Fetching recent conversations for user {}", userId);
-        
+
         List<MessageEntity> recentMessages = messageRepository.findRecentMessagesForUser(userId);
-        
+
         // Group by conversation and get last message from each
         return recentMessages.stream()
                 .collect(Collectors.groupingBy(MessageEntity::getConversationId))
                 .entrySet().stream()
                 .map(entry -> {
                     MessageEntity lastMessage = entry.getValue().get(0); // Already sorted by timestamp DESC
-                    
+
                     ConversationSummaryDTO summary = new ConversationSummaryDTO();
                     summary.setConversationId(entry.getKey());
                     summary.setLastMessage(lastMessage.getCntMessage());
                     summary.setLastMessageTime(lastMessage.getTimeStamp());
-                    
+
                     // Set other user info
                     if (lastMessage.getMsgSender().getUserId().equals(userId)) {
                         summary.setOtherUserId(lastMessage.getMsgRecipient().getUserId());
@@ -154,13 +154,13 @@ public class ChatService {
                         summary.setOtherUserId(lastMessage.getMsgSender().getUserId());
                         summary.setOtherUserNickname(lastMessage.getMsgSender().getNickName());
                     }
-                    
+
                     // Count unread messages in this conversation
                     long unreadCount = entry.getValue().stream()
                             .filter(msg -> msg.getMsgRecipient().getUserId().equals(userId) && !msg.isRead())
                             .count();
                     summary.setUnreadCount(unreadCount);
-                    
+
                     return summary;
                 })
                 .sorted((a, b) -> b.getLastMessageTime().compareTo(a.getLastMessageTime()))
@@ -172,14 +172,14 @@ public class ChatService {
      */
     public void markMessagesAsRead(String conversationId, Long userId) {
         log.info("Marking messages as read in conversation {} for user {}", conversationId, userId);
-        
+
         List<MessageEntity> messages = messageRepository.findByConversationId(conversationId);
         messages.forEach(msg -> {
             if (msg.getMsgRecipient().getUserId().equals(userId) && !msg.isRead()) {
                 msg.setRead(true);
             }
         });
-        
+
         messageRepository.saveAll(messages);
     }
 
@@ -188,10 +188,10 @@ public class ChatService {
      */
     public void deleteMessage(Long messageId, Long userId) {
         log.info("Deleting message {} for user {}", messageId, userId);
-        
+
         MessageEntity message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
-        
+
         if (message.getMsgSender().getUserId().equals(userId)) {
             message.setDeletedBySender(true);
         } else if (message.getMsgRecipient().getUserId().equals(userId)) {
@@ -199,7 +199,7 @@ public class ChatService {
         } else {
             throw new UnauthorizedException("You are not authorized to delete this message");
         }
-        
+
         // If both users deleted, remove from database
         if (message.isDeletedBySender() && message.isDeletedByRecipient()) {
             messageRepository.delete(message);
@@ -213,23 +213,23 @@ public class ChatService {
      */
     public MessageDTO editMessage(Long messageId, String newContent, Long userId) {
         log.info("Editing message {} by user {}", messageId, userId);
-        
+
         MessageEntity message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Message not found"));
-        
+
         // Only sender can edit
         if (!message.getMsgSender().getUserId().equals(userId)) {
             throw new UnauthorizedException("Only sender can edit the message");
         }
-        
+
         // Check if message is too old to edit (e.g., 24 hours)
         if (message.getTimeStamp().plusHours(24).isBefore(OffsetDateTime.now())) {
             throw new UnauthorizedException("Message is too old to edit");
         }
-        
+
         message.setCntMessage(newContent);
         message.setEditedAt(OffsetDateTime.now());
-        
+
         MessageEntity savedMessage = messageRepository.save(message);
         return messageMapper.toDTO(savedMessage);
     }
@@ -247,16 +247,16 @@ public class ChatService {
     public List<MessageDTO> getNewMessages(String conversationId, OffsetDateTime lastCheckTime, Long userId) {
         List<MessageEntity> newMessages = messageRepository.findNewMessagesInConversation(
                 conversationId, lastCheckTime);
-        
+
         // Verify user is part of conversation
         if (!newMessages.isEmpty()) {
             MessageEntity firstMessage = newMessages.get(0);
             if (!firstMessage.getMsgSender().getUserId().equals(userId) &&
-                !firstMessage.getMsgRecipient().getUserId().equals(userId)) {
+                        !firstMessage.getMsgRecipient().getUserId().equals(userId)) {
                 throw new UnauthorizedException("You are not authorized to view this conversation");
             }
         }
-        
+
         return messageMapper.toDTOs(newMessages);
     }
 
@@ -264,11 +264,7 @@ public class ChatService {
      * Helper method to generate conversation ID
      */
     private String generateConversationId(Long userId1, Long userId2) {
-        return userId1 < userId2 ? 
-            "conv_" + userId1 + "_" + userId2 : 
-            "conv_" + userId2 + "_" + userId1;
-    }
-}
+        return userId1 < userId2 ?  
 
 // Additional DTO for conversation summary
 @lombok.Data

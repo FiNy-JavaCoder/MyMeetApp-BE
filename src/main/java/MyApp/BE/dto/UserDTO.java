@@ -1,6 +1,5 @@
 package MyApp.BE.dto;
 
-
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.Regions;
 import lombok.AllArgsConstructor;

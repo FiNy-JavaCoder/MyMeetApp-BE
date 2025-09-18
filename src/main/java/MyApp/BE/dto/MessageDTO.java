@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class MessageDTO {
 
+    private Long messageId;
     private Long senderId;
     private Long recipientId;
     private String cntMessage;

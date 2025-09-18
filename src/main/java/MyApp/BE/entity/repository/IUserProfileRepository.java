@@ -13,5 +13,4 @@ public interface IUserProfileRepository extends JpaRepository<UserProfileEntity,
 
     List<UserProfileEntity> findByGender(GenderType gender);
 
-
 }

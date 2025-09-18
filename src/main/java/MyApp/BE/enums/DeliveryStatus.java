@@ -1,8 +1,8 @@
 package MyApp.BE.enums;
 
-    public enum DeliveryStatus {
-        SENT,
-        DELIVERED,
-        READ,
-        FAILED
-    }
+public enum DeliveryStatus {
+    SENT,
+    DELIVERED,
+    READ,
+    FAILED
+}
