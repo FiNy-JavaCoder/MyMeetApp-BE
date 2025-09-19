@@ -265,17 +265,16 @@ public class ChatService {
      * Helper method to generate conversation ID
      */
     private String generateConversationId(Long userId1, Long userId2) {
-        return userId1 < userId2 ?  
+        if (userId1 == null || userId2 == null) {
+            throw new IllegalArgumentException("User IDs cannot be null");
+        }
 
-// Additional DTO for conversation summary
-@lombok.Data
-@lombok.AllArgsConstructor
-@lombok.NoArgsConstructor
-class ConversationSummaryDTO {
-    private String conversationId;
-    private Long otherUserId;
-    private String otherUserNickname;
-    private String lastMessage;
-    private OffsetDateTime lastMessageTime;
-    private long unreadCount;
+        if (userId1.equals(userId2)) {
+            throw new IllegalArgumentException("Cannot create conversation with same user");
+        }
+
+        return userId1 < userId2 ?
+                String.format("%d_%d", userId1, userId2) :
+                String.format("%d_%d", userId2, userId1);
+    }
 }
