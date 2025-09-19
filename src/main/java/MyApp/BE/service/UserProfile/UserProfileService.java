@@ -8,6 +8,9 @@ import MyApp.BE.entity.UserProfileEntity;
 import MyApp.BE.entity.repository.IUserProfileRepository;
 import MyApp.BE.entity.repository.IUserRepository;
 import MyApp.BE.enums.GenderType;
+import MyApp.BE.enums.SearchSexualOrientation;
+import MyApp.BE.enums.SearchTypeRelationShip;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,12 +80,52 @@ public class UserProfileService {
                 .orElseThrow(() -> new RuntimeException("User profile not found")));
 
     }
-    /**
-     * public UserProfileDTO editUserProfile(Long userId) {
-     * UserProfileDTO loadedProfile = findProfile(userId);
-     * 
-     * return
-     * }
-     **/
+public List<UserProfileDTO> searchUsers(
+        String nickName, 
+        GenderType gender, 
+        Integer minAge, 
+        Integer maxAge,
+        SearchSexualOrientation sexualOrientation,
+        SearchTypeRelationShip lookingFor,
+        List<String> regions,
+        List<String> districts
+) {
+    // Implementujte logiku pro komplexní vyhledávání
+    // Toto je jen ukázka - implementujte podle vašich potřeb
+    
+    List<UserProfileEntity> allProfiles = userProfileRepository.findAll();
+    
+    return allProfiles.stream()
+            .filter(profile -> {
+                boolean matches = true;
+                
+                if (nickName != null && !nickName.isEmpty()) {
+                    matches = matches && profile.getUserEntity().getNickName()
+                            .toLowerCase().contains(nickName.toLowerCase());
+                }
+                
+                if (gender != null) {
+                    matches = matches && profile.getGender().equals(gender);
+                }
+                
+                if (sexualOrientation != null) {
+                    matches = matches && profile.getSexualOrientation().equals(sexualOrientation);
+                }
+                
+                if (lookingFor != null) {
+                    matches = matches && profile.getSearchTypeRelationShip().equals(lookingFor);
+                }
+                
+                // Přidejte další filtry podle potřeby
+                
+                return matches;
+            })
+            .map(entity -> {
+                UserProfileDTO dto = userProfileMapper.toPublicDTO(entity);
+                dto.setAge(calculateAge(entity, dto));
+                return dto;
+            })
+            .collect(Collectors.toList());
+}
 
 }
