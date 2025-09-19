@@ -2,7 +2,7 @@ package MyApp.BE.controller;
 
 import MyApp.BE.dto.ConversationDTO;
 import MyApp.BE.dto.ErrorDTO;
-import MyApp.BE.service.Conversation.ConversationService;
+import MyApp.BE.service.conversation.ConversationService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

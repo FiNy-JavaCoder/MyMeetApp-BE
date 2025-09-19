@@ -6,7 +6,7 @@ import MyApp.BE.entity.MessageEntity;
 import MyApp.BE.entity.UserEntity;
 import MyApp.BE.entity.repository.IMessageRepository;
 import MyApp.BE.entity.repository.IUserRepository;
-import MyApp.BE.service.Message.MessageService;
+import MyApp.BE.service.message.MessageService;
 import MyApp.BE.service.ZoneTime.IZoneTimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
