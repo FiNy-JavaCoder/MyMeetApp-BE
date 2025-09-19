@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: connecta_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: connecta_db
+      MYSQL_USER: connecta_user
+      MYSQL_PASSWORD: connecta_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - connecta_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend Application
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: connecta_backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_USERNAME: connecta_user
+      DB_PASSWORD: connecta_password
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - connecta_network
+    volumes:
+      - ./logs:/var/log/connecta
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Application (React)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: connecta_frontend
+    environment:
+      VITE_API_BASE_URL: http://backend:8080/api
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - connecta_network
+
+volumes:
+  mysql_data:
+
+networks:
+  connecta_network:
+    driver: bridge
+
+---

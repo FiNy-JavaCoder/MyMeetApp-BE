@@ -2,9 +2,11 @@ package MyApp.BE.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
 @Entity(name = "person")
+@ToString(exclude = "userProfileEntity") // Prevent circular reference in toString
 public class UserEntity {
 
     @Id
@@ -24,6 +26,14 @@ public class UserEntity {
     @Column(name = "is_admin", nullable = false)
     private boolean admin = false;
 
-    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserProfileEntity userProfileEntity;
+
+    // Helper method to maintain bidirectional relationship
+    public void setUserProfileEntity(UserProfileEntity userProfileEntity) {
+        this.userProfileEntity = userProfileEntity;
+        if (userProfileEntity != null) {
+            userProfileEntity.setUserEntity(this);
+        }
+    }
 }

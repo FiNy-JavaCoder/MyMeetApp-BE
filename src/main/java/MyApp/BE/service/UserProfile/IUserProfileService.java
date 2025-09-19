@@ -1,6 +1,5 @@
 package MyApp.BE.service.UserProfile;
 
-import MyApp.BE.dto.RegistrationDTO;
 import MyApp.BE.dto.UserProfileDTO;
 import MyApp.BE.dto.UserProfilePrivateDTO;
 import MyApp.BE.enums.GenderType;
@@ -15,5 +14,4 @@ public interface IUserProfileService {
     ResponseEntity<UserProfilePrivateDTO> getUserPrivateProfile(Long personId);
 
     List<UserProfileDTO> findByGender(GenderType genderType);
-
 }

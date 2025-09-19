@@ -1,6 +1,10 @@
 package MyApp.BE.dto;
 
-public class UserProfilePrivateDTO extends UserProfileDTO {
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class UserProfilePrivateDTO extends UserProfileDTO {
     private String favoriteFilter;
 }

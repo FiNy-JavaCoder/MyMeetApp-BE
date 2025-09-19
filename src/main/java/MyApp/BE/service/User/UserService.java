@@ -11,8 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService implements IUserService {
@@ -23,32 +22,47 @@ public class UserService implements IUserService {
     private final UserProfileMapper profileMapper;
 
     @Autowired
-    public UserService(IUserRepository userRepository, IUserProfileRepository profileRepository, UserMapper userMapper,
-            UserProfileMapper profileMapper) {
+    public UserService(IUserRepository userRepository, 
+                      IUserProfileRepository profileRepository, 
+                      UserMapper userMapper, 
+                      UserProfileMapper profileMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.profileRepository = profileRepository;
         this.profileMapper = profileMapper;
     }
 
+    @Override
+    @Transactional
     public ResponseEntity<?> registerUser(RegistrationDTO registrationDTO) {
-        if ((userRepository.existsByNickName(registrationDTO.getNickName()))
-                || userRepository.existsByEmail(registrationDTO.getEmail())) {
+        // Validace duplicity
+        if (userRepository.existsByNickName(registrationDTO.getNickName()) || 
+            userRepository.existsByEmail(registrationDTO.getEmail())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ErrorDTO("Nickname or Email is already taken"));
         }
-        PrivateUserDTO privateUserDTO = new PrivateUserDTO();
-        privateUserDTO.setNickName(registrationDTO.getNickName());
-        privateUserDTO.setEmail(registrationDTO.getEmail());
-        privateUserDTO.setPasswordHash(registrationDTO.getPasswordHash());
 
-        UserEntity userToSave = userMapper.toEntity(privateUserDTO);
-        UserProfileEntity userProfile = new UserProfileEntity();
-        userToSave.setUserProfileEntity(userProfile);
-        userProfile.setUserEntity(userToSave);
-        userRepository.save(userToSave);
-
-        return ResponseEntity.ok("User and its profile saved");
+        try {
+            // Vytvoření user entity
+            UserEntity userToSave = userMapper.toEntity(registrationDTO);
+            
+            // Vytvoření prázdného profilu
+            UserProfileEntity userProfile = new UserProfileEntity();
+            
+            // Nastavení bidirectional relationship
+            userToSave.setUserProfileEntity(userProfile);
+            userProfile.setUserEntity(userToSave);
+            
+            // Uložení (cascade se postará o profil)
+            UserEntity savedUser = userRepository.save(userToSave);
+            
+            return ResponseEntity.ok("User and its profile saved successfully with ID: " + savedUser.getUserId());
+            
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Registration failed: " + e.getMessage()));
+        }
     }
 }

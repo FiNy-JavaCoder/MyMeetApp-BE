@@ -4,11 +4,14 @@ import MyApp.BE.dto.mapper.converters.RegionsSetConverter;
 import MyApp.BE.enums.*;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
+
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data
 @Entity(name = "user_profile")
+@ToString(exclude = "userEntity") // Prevent circular reference in toString
 public class UserProfileEntity {
 
     @Id
@@ -41,11 +44,19 @@ public class UserProfileEntity {
     private Set<Districts> districts;
 
     @Column(name = "birth_date", nullable = true)
-    LocalDate birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "profile_picture_url", nullable = true)
     private String profilePictureUrl;
 
     @Column(name = "about_me", length = 500, nullable = true)
     private String aboutMe;
+
+    // Helper method to maintain bidirectional relationship
+    public void setUserEntity(UserEntity userEntity) {
+        this.userEntity = userEntity;
+        if (userEntity != null) {
+            this.userId = userEntity.getUserId();
+        }
+    }
 }
