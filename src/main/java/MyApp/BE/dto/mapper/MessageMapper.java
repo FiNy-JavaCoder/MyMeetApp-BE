@@ -15,13 +15,21 @@ public interface MessageMapper {
     @Mapping(target = "msgSender", ignore = true)
     @Mapping(target = "msgRecipient", ignore = true)
     @Mapping(target = "timeStamp", ignore = true)
+    @Mapping(target = "isRead", ignore = true)
+    @Mapping(target = "isDeletedBySender", ignore = true)
+    @Mapping(target = "isDeletedByRecipient", ignore = true)
+    @Mapping(target = "editedAt", ignore = true)
     MessageEntity toEntity(MessageDTO dto);
 
+    @Mapping(source = "messageId", target = "messageId")
     @Mapping(source = "msgRecipient.userId", target = "recipientId")
     @Mapping(source = "msgSender.userId", target = "senderId")
     @Mapping(source = "cntMessage", target = "cntMessage")
     @Mapping(source = "conversationId", target = "conversationId")
     @Mapping(source = "timeStamp", target = "timeStamp")
+    @Mapping(source = "isRead", target = "isRead")
+    @Mapping(source = "editedAt", target = "editedAt")
+    @Mapping(expression = "java(entity.getEditedAt() != null)", target = "isEdited")
     MessageDTO toDTO(MessageEntity entity);
 
     List<MessageDTO> toDTOs(List<MessageEntity> messageEntities);

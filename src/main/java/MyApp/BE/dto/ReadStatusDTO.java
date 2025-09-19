@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-class ReadStatusDTO {
+public class ReadStatusDTO {
     private String conversationId;
     private Long readByUserId;
     private OffsetDateTime timestamp;

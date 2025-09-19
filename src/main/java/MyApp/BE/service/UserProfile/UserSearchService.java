@@ -7,8 +7,10 @@ import MyApp.BE.entity.repository.IUserProfileRepository;
 import MyApp.BE.enums.GenderType;
 import MyApp.BE.enums.SearchSexualOrientation;
 import MyApp.BE.enums.SearchTypeRelationShip;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -16,14 +18,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserSearchService {
 
-    @Autowired
-    private IUserProfileRepository userProfileRepository;
+    private final IUserProfileRepository userProfileRepository;
+    private final UserProfileMapper userProfileMapper;
 
-    @Autowired
-    private UserProfileMapper userProfileMapper;
-
+    @Transactional(readOnly = true)
     public List<UserProfileDTO> searchUsers(
             String nickName,
             GenderType gender,
@@ -34,6 +36,9 @@ public class UserSearchService {
             List<String> regions,
             List<String> districts
     ) {
+        log.info("Searching users with criteria: gender={}, age={}-{}, orientation={}, lookingFor={}", 
+                gender, minAge, maxAge, sexualOrientation, lookingFor);
+
         List<UserProfileEntity> allProfiles = userProfileRepository.findAll();
         
         return allProfiles.stream()
@@ -60,15 +65,16 @@ public class UserSearchService {
             List<String> districts
     ) {
         // Filtrování podle přezdívky
-        if (nickName != null && !nickName.isEmpty()) {
-            if (!profile.getUserEntity().getNickName()
-                    .toLowerCase().contains(nickName.toLowerCase())) {
+        if (nickName != null && !nickName.trim().isEmpty()) {
+            String profileNickName = profile.getUserEntity() != null && profile.getUserEntity().getNickName() != null 
+                ? profile.getUserEntity().getNickName() : "";
+            if (!profileNickName.toLowerCase().contains(nickName.toLowerCase().trim())) {
                 return false;
             }
         }
 
         // Filtrování podle pohlaví
-        if (gender != null && !profile.getGender().equals(gender)) {
+        if (gender != null && profile.getGender() != null && !profile.getGender().equals(gender)) {
             return false;
         }
 
@@ -84,26 +90,33 @@ public class UserSearchService {
         }
 
         // Filtrování podle sexuální orientace
-        if (sexualOrientation != null && 
+        if (sexualOrientation != null && profile.getSexualOrientation() != null && 
             !sexualOrientation.equals(profile.getSexualOrientation())) {
             return false;
         }
 
         // Filtrování podle typu vztahu
-        if (lookingFor != null && 
+        if (lookingFor != null && profile.getSearchTypeRelationShip() != null && 
             !lookingFor.equals(profile.getSearchTypeRelationShip())) {
             return false;
         }
 
-        // Filtrování podle regionů - implementujte podle vaší logiky
-        if (regions != null && !regions.isEmpty()) {
-            // Zde implementujte logiku pro kontrolu regionů
-            // Například pokud profile.getRegions() obsahuje některý z hledaných regionů
+        // Filtrování podle regionů
+        if (regions != null && !regions.isEmpty() && profile.getRegions() != null) {
+            boolean hasMatchingRegion = profile.getRegions().stream()
+                    .anyMatch(profileRegion -> regions.contains(profileRegion.toString()));
+            if (!hasMatchingRegion) {
+                return false;
+            }
         }
 
         // Filtrování podle okresů
-        if (districts != null && !districts.isEmpty()) {
-            // Zde implementujte logiku pro kontrolu okresů
+        if (districts != null && !districts.isEmpty() && profile.getDistricts() != null) {
+            boolean hasMatchingDistrict = profile.getDistricts().stream()
+                    .anyMatch(profileDistrict -> districts.contains(profileDistrict.toString()));
+            if (!hasMatchingDistrict) {
+                return false;
+            }
         }
 
         return true;

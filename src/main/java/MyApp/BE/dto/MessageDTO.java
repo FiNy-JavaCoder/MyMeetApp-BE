@@ -15,6 +15,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 public class MessageDTO {
 
+    private Long messageId;
+
     @NotNull(message = "ID odesílatele je povinné")
     private Long senderId;
     
@@ -29,6 +31,12 @@ public class MessageDTO {
     
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private OffsetDateTime timeStamp;
+
+    private boolean isRead;
+    
+    private boolean isEdited;
+    
+    private OffsetDateTime editedAt;
 
     // Helper method to get conversation ID
     public String getGeneratedConversationId() {

@@ -335,3 +335,24 @@ logging:
   level:
     MyApp.BE: INFO
     root: INFO
+
+# WebSocket configuration
+websocket:
+  allowed-origins:
+    - "http://localhost:5173"
+    - "http://localhost:3000"
+    - "http://127.0.0.1:5173"
+  stomp:
+    endpoint: "/ws"
+    application-prefix: "/app"
+    simple-broker: "/topic,/queue"
+
+# Cache configuration pro chat
+spring:
+  cache:
+    cache-names:
+      - conversations
+      - userStatus
+      - messageCount
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=600s

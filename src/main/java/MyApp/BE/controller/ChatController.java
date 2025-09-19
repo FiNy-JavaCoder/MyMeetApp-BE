@@ -1,9 +1,9 @@
 package MyApp.BE.controller;
 
+import MyApp.BE.dto.ConversationSummaryDTO;
 import MyApp.BE.dto.ErrorDTO;
 import MyApp.BE.dto.MessageDTO;
 import MyApp.BE.service.ChatService;
-import MyApp.BE.dto.ConversationSummaryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
@@ -26,6 +25,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chat")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"})
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Chat", description = "Chat messaging endpoints")
@@ -42,16 +42,18 @@ public class ChatController {
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<MessageDTO> sendMessage(
-            @Valid @RequestBody MessageDTO messageDTO,
-            Authentication authentication) {
-        
-        // Set sender ID from authenticated user
-        Long senderId = getUserIdFromAuthentication(authentication);
-        messageDTO.setSenderId(senderId);
-        
-        MessageDTO sentMessage = chatService.sendMessage(messageDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(sentMessage);
+    public ResponseEntity<?> sendMessage(@Valid @RequestBody MessageDTO messageDTO) {
+        try {
+            MessageDTO sentMessage = chatService.sendMessage(messageDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(sentMessage);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid message data: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error sending message", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se odeslat zprávu"));
+        }
     }
 
     @GetMapping("/conversation/{otherUserId}")
@@ -61,14 +63,18 @@ public class ChatController {
             @ApiResponse(responseCode = "404", description = "User not found",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<List<MessageDTO>> getConversation(
+    public ResponseEntity<?> getConversation(
             @Parameter(description = "ID of the other user in conversation")
             @PathVariable Long otherUserId,
-            Authentication authentication) {
-        
-        Long currentUserId = getUserIdFromAuthentication(authentication);
-        List<MessageDTO> messages = chatService.getConversation(currentUserId, otherUserId);
-        return ResponseEntity.ok(messages);
+            @RequestParam Long currentUserId) {
+        try {
+            List<MessageDTO> messages = chatService.getConversation(currentUserId, otherUserId);
+            return ResponseEntity.ok(messages);
+        } catch (Exception e) {
+            log.error("Error getting conversation between {} and {}", currentUserId, otherUserId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst konverzaci"));
+        }
     }
 
     @GetMapping("/conversation")
@@ -78,38 +84,51 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "Unauthorized access",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<List<MessageDTO>> getMessagesByConversationId(
+    public ResponseEntity<?> getMessagesByConversationId(
             @Parameter(description = "Conversation ID")
             @RequestParam String conversationId,
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        List<MessageDTO> messages = chatService.getMessagesByConversationId(conversationId, userId);
-        return ResponseEntity.ok(messages);
+            @RequestParam Long userId) {
+        try {
+            List<MessageDTO> messages = chatService.getMessagesByConversationId(conversationId, userId);
+            return ResponseEntity.ok(messages);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error getting messages for conversation {}", conversationId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst zprávy"));
+        }
     }
 
     @GetMapping("/conversations/recent")
     @Operation(summary = "Get recent conversations for the current user")
     @ApiResponse(responseCode = "200", description = "Conversations retrieved successfully")
-    public ResponseEntity<List<ConversationSummaryDTO>> getRecentConversations(
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        List<ConversationSummaryDTO> conversations = chatService.getRecentConversations(userId);
-        return ResponseEntity.ok(conversations);
+    public ResponseEntity<?> getRecentConversations(@RequestParam Long userId) {
+        try {
+            List<ConversationSummaryDTO> conversations = chatService.getRecentConversations(userId);
+            return ResponseEntity.ok(conversations);
+        } catch (Exception e) {
+            log.error("Error getting recent conversations for user {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst konverzace"));
+        }
     }
 
     @PutMapping("/mark-read/{conversationId}")
     @Operation(summary = "Mark all messages in a conversation as read")
     @ApiResponse(responseCode = "204", description = "Messages marked as read")
-    public ResponseEntity<Void> markMessagesAsRead(
+    public ResponseEntity<?> markMessagesAsRead(
             @Parameter(description = "Conversation ID")
             @PathVariable String conversationId,
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        chatService.markMessagesAsRead(conversationId, userId);
-        return ResponseEntity.noContent().build();
+            @RequestParam Long userId) {
+        try {
+            chatService.markMessagesAsRead(conversationId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Error marking messages as read in conversation {}", conversationId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se označit zprávy jako přečtené"));
+        }
     }
 
     @DeleteMapping("/message/{messageId}")
@@ -121,14 +140,18 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "Unauthorized to delete",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<Void> deleteMessage(
+    public ResponseEntity<?> deleteMessage(
             @Parameter(description = "Message ID")
             @PathVariable Long messageId,
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        chatService.deleteMessage(messageId, userId);
-        return ResponseEntity.noContent().build();
+            @RequestParam Long userId) {
+        try {
+            chatService.deleteMessage(messageId, userId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            log.error("Error deleting message {}", messageId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se smazat zprávu"));
+        }
     }
 
     @PutMapping("/message/{messageId}")
@@ -140,28 +163,34 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "Unauthorized to edit",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<MessageDTO> editMessage(
+    public ResponseEntity<?> editMessage(
             @Parameter(description = "Message ID")
             @PathVariable Long messageId,
             @RequestBody Map<String, String> request,
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        String newContent = request.get("content");
-        
-        MessageDTO editedMessage = chatService.editMessage(messageId, newContent, userId);
-        return ResponseEntity.ok(editedMessage);
+            @RequestParam Long userId) {
+        try {
+            String newContent = request.get("content");
+            MessageDTO editedMessage = chatService.editMessage(messageId, newContent, userId);
+            return ResponseEntity.ok(editedMessage);
+        } catch (Exception e) {
+            log.error("Error editing message {}", messageId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se upravit zprávu"));
+        }
     }
 
     @GetMapping("/unread-count")
     @Operation(summary = "Get unread message count for current user")
     @ApiResponse(responseCode = "200", description = "Unread count retrieved successfully")
-    public ResponseEntity<Map<String, Long>> getUnreadMessageCount(
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        Long unreadCount = chatService.getUnreadMessageCount(userId);
-        return ResponseEntity.ok(Map.of("unreadCount", unreadCount));
+    public ResponseEntity<?> getUnreadMessageCount(@RequestParam Long userId) {
+        try {
+            Long unreadCount = chatService.getUnreadMessageCount(userId);
+            return ResponseEntity.ok(Map.of("unreadCount", unreadCount));
+        } catch (Exception e) {
+            log.error("Error getting unread count for user {}", userId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst počet nepřečtených zpráv"));
+        }
     }
 
     @GetMapping("/new-messages")
@@ -171,22 +200,66 @@ public class ChatController {
             @ApiResponse(responseCode = "403", description = "Unauthorized access",
                     content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
     })
-    public ResponseEntity<List<MessageDTO>> getNewMessages(
+    public ResponseEntity<?> getNewMessages(
             @RequestParam String conversationId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime lastCheckTime,
-            Authentication authentication) {
-        
-        Long userId = getUserIdFromAuthentication(authentication);
-        List<MessageDTO> newMessages = chatService.getNewMessages(conversationId, lastCheckTime, userId);
-        return ResponseEntity.ok(newMessages);
+            @RequestParam Long userId) {
+        try {
+            List<MessageDTO> newMessages = chatService.getNewMessages(conversationId, lastCheckTime, userId);
+            return ResponseEntity.ok(newMessages);
+        } catch (Exception e) {
+            log.error("Error getting new messages for conversation {}", conversationId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst nové zprávy"));
+        }
     }
 
-    /**
-     * Helper method to extract user ID from authentication
-     */
-    private Long getUserIdFromAuthentication(Authentication authentication) {
-        // Implement based on your authentication setup
-        // This is a placeholder - adjust according to your security configuration
-        return Long.parseLong(authentication.getName());
+    @GetMapping("/conversation/{conversationId}/messages")
+    @Operation(summary = "Get paginated messages for conversation")
+    public ResponseEntity<?> getConversationMessages(
+            @PathVariable String conversationId,
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "50") @Min(1) int size) {
+        try {
+            List<MessageDTO> messages = chatService.getConversationMessages(conversationId, userId, page, size);
+            return ResponseEntity.ok(messages);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ErrorDTO(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error getting paginated messages for conversation {}", conversationId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se načíst zprávy"));
+        }
+    }
+
+    @GetMapping("/conversation-exists")
+    @Operation(summary = "Check if conversation exists between two users")
+    public ResponseEntity<?> conversationExists(
+            @RequestParam Long userId1,
+            @RequestParam Long userId2) {
+        try {
+            boolean exists = chatService.conversationExists(userId1, userId2);
+            return ResponseEntity.ok(Map.of("exists", exists));
+        } catch (Exception e) {
+            log.error("Error checking if conversation exists between {} and {}", userId1, userId2, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se ověřit existenci konverzace"));
+        }
+    }
+
+    @GetMapping("/conversation-id")
+    @Operation(summary = "Get conversation ID for two users")
+    public ResponseEntity<?> getConversationId(
+            @RequestParam Long userId1,
+            @RequestParam Long userId2) {
+        try {
+            String conversationId = chatService.getConversationId(userId1, userId2);
+            return ResponseEntity.ok(Map.of("conversationId", conversationId));
+        } catch (Exception e) {
+            log.error("Error getting conversation ID between {} and {}", userId1, userId2, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorDTO("Nepodařilo se získat ID konverzace"));
+        }
     }
 }

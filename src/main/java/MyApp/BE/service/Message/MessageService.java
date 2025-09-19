@@ -27,9 +27,9 @@ public class MessageService implements IMessageService {
 
     @Autowired
     public MessageService(IMessageRepository messageRepository,
-                          MessageMapper messageMapper,
-                          IUserRepository userRepository,
-                          IZoneTimeService zoneTimeService) {
+            MessageMapper messageMapper,
+            IUserRepository userRepository,
+            IZoneTimeService zoneTimeService) {
         this.messageRepository = messageRepository;
         this.messageMapper = messageMapper;
         this.userRepository = userRepository;
@@ -42,7 +42,7 @@ public class MessageService implements IMessageService {
         if (conversationId == null || conversationId.trim().isEmpty()) {
             throw new IllegalArgumentException("Conversation ID cannot be null or empty");
         }
-        
+
         List<MessageEntity> messages = messageRepository.findByConversationId(conversationId);
         return messageMapper.toDTOs(messages);
     }
@@ -53,22 +53,24 @@ public class MessageService implements IMessageService {
         if (messageDTO == null) {
             throw new IllegalArgumentException("Message DTO cannot be null");
         }
-        
+
         // Validate required fields
         if (messageDTO.getSenderId() == null || messageDTO.getRecipientId() == null) {
             throw new IllegalArgumentException("Sender ID and Recipient ID are required");
         }
-        
+
         if (messageDTO.getCntMessage() == null || messageDTO.getCntMessage().trim().isEmpty()) {
             throw new IllegalArgumentException("Message content cannot be empty");
         }
 
         // Get users
         UserEntity sender = userRepository.findById(messageDTO.getSenderId())
-                .orElseThrow(() -> new IllegalArgumentException("Sender not found with ID: " + messageDTO.getSenderId()));
-        
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Sender not found with ID: " + messageDTO.getSenderId()));
+
         UserEntity recipient = userRepository.findById(messageDTO.getRecipientId())
-                .orElseThrow(() -> new IllegalArgumentException("Recipient not found with ID: " + messageDTO.getRecipientId()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Recipient not found with ID: " + messageDTO.getRecipientId()));
 
         // Create message entity
         MessageEntity messageEntity = new MessageEntity();
@@ -124,7 +126,7 @@ public class MessageService implements IMessageService {
 
             // Save message
             MessageEntity savedMessageEntity = messageRepository.save(messageEntity);
-            
+
             // Convert back to DTO
             MessageDTO responseMessageDTO = messageMapper.toDTO(savedMessageEntity);
 
@@ -145,11 +147,11 @@ public class MessageService implements IMessageService {
         if (id1 == null || id2 == null) {
             throw new IllegalArgumentException("User IDs cannot be null");
         }
-        
+
         if (id1.equals(id2)) {
             throw new IllegalArgumentException("Cannot create conversation with same user");
         }
-        
+
         if (id1.compareTo(id2) < 0) {
             return String.format("%d_%d", id1, id2);
         } else {
@@ -165,8 +167,9 @@ public class MessageService implements IMessageService {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
         }
-        
-        // This would require a more complex query to get the latest message from each conversation
+
+        // This would require a more complex query to get the latest message from each
+        // conversation
         // For now, return empty list - implement based on your needs
         return List.of();
     }
@@ -179,7 +182,7 @@ public class MessageService implements IMessageService {
         if (userId == null) {
             throw new IllegalArgumentException("User ID cannot be null");
         }
-        
+
         // Get all unique conversation IDs where user is sender or recipient
         return messageRepository.findDistinctConversationIdsByUserId(userId);
     }
@@ -192,7 +195,7 @@ public class MessageService implements IMessageService {
         if (userId1 == null || userId2 == null) {
             return false;
         }
-        
+
         String conversationId = generateCanonicalConversationId(userId1, userId2);
         return messageRepository.existsByConversationId(conversationId);
     }
@@ -205,7 +208,7 @@ public class MessageService implements IMessageService {
         if (conversationId == null || conversationId.trim().isEmpty()) {
             return 0;
         }
-        
+
         return messageRepository.countByConversationId(conversationId);
     }
 
@@ -227,13 +230,39 @@ public class MessageService implements IMessageService {
         if (conversationId == null || conversationId.trim().isEmpty()) {
             throw new IllegalArgumentException("Conversation ID cannot be null or empty");
         }
-        
+
         if (page < 0 || size <= 0) {
             throw new IllegalArgumentException("Invalid page parameters");
         }
-        
+
         // For now, return all messages - implement pagination as needed
         List<MessageEntity> messages = messageRepository.findByConversationIdOrderByTimeStampDesc(conversationId);
         return messageMapper.toDTOs(messages);
+    }
+    
+  @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "conversations", key = "#conversationId")
+    public List<MessageDTO> getConversationById(String conversationId) {
+        if (conversationId == null || conversationId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Conversation ID cannot be null or empty");
+        }
+        
+        List<MessageEntity> messages = messageRepository.findByConversationId(conversationId);
+        return messageMapper.toDTOs(messages);
+    }
+
+    @Cacheable(value = "messageCount", key = "#conversationId")
+    public long getMessageCount(String conversationId) {
+        if (conversationId == null || conversationId.trim().isEmpty()) {
+            return 0;
+        }
+        
+        return messageRepository.countByConversationId(conversationId);
+    }
+
+    @CacheEvict(value = {"conversations", "messageCount"}, key = "#messageDTO.conversationId")
+    public ResponseEntity<MessageDTO> createMessage(MessageDTO messageDTO) {
+        // ... existing implementation
     }
 }

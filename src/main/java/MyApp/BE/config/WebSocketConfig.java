@@ -12,13 +12,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Enable a simple memory-based message broker to carry messages back to clients
-        // on destinations prefixed with "/topic" and "/queue"
+        // Enable simple broker for sending messages to clients
         config.enableSimpleBroker("/topic", "/queue");
-        
-        // Set application destination prefix for messages bound for @MessageMapping methods
+        // Set application destination prefix for messages from clients
         config.setApplicationDestinationPrefixes("/app");
-        
         // Set user destination prefix for user-specific messages
         config.setUserDestinationPrefix("/user");
     }
@@ -26,12 +23,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Register STOMP endpoint for WebSocket connection
-        registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns("*")
-                .withSockJS(); // Enable SockJS fallback
-        
-        // Also register without SockJS for native WebSocket support
-        registry.addEndpoint("/ws-chat")
-                .setAllowedOriginPatterns("*");
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
+                .withSockJS();
     }
 }
