@@ -2,13 +2,15 @@ package MyApp.BE.controller;
 
 import MyApp.BE.dto.MessageDTO;
 import MyApp.BE.dto.ErrorDTO;
-import MyApp.BE.service.Message.MessageService;
+import MyApp.BE.service.message.MessageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"})
 public class MessageController {
 
+    @Autowired
     private final MessageService messageService;
 
     public MessageController(MessageService messageService) {

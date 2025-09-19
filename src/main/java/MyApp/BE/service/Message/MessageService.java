@@ -1,4 +1,4 @@
-package MyApp.BE.service.Message;
+package MyApp.BE.service.message;
 
 import MyApp.BE.dto.MessageDTO;
 import MyApp.BE.dto.mapper.MessageMapper;
@@ -238,31 +238,5 @@ public class MessageService implements IMessageService {
         // For now, return all messages - implement pagination as needed
         List<MessageEntity> messages = messageRepository.findByConversationIdOrderByTimeStampDesc(conversationId);
         return messageMapper.toDTOs(messages);
-    }
-    
-  @Override
-    @Transactional(readOnly = true)
-    @Cacheable(value = "conversations", key = "#conversationId")
-    public List<MessageDTO> getConversationById(String conversationId) {
-        if (conversationId == null || conversationId.trim().isEmpty()) {
-            throw new IllegalArgumentException("Conversation ID cannot be null or empty");
-        }
-        
-        List<MessageEntity> messages = messageRepository.findByConversationId(conversationId);
-        return messageMapper.toDTOs(messages);
-    }
-
-    @Cacheable(value = "messageCount", key = "#conversationId")
-    public long getMessageCount(String conversationId) {
-        if (conversationId == null || conversationId.trim().isEmpty()) {
-            return 0;
-        }
-        
-        return messageRepository.countByConversationId(conversationId);
-    }
-
-    @CacheEvict(value = {"conversations", "messageCount"}, key = "#messageDTO.conversationId")
-    public ResponseEntity<MessageDTO> createMessage(MessageDTO messageDTO) {
-        // ... existing implementation
     }
 }

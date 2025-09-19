@@ -1,6 +1,7 @@
 package MyApp.BE.service.message;
 
 import MyApp.BE.dto.MessageDTO;
+import MyApp.BE.dto.ConversationSummaryDTO;
 import MyApp.BE.dto.mapper.MessageMapper;
 import MyApp.BE.entity.MessageEntity;
 import MyApp.BE.entity.UserEntity;

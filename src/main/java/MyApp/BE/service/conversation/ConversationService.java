@@ -1,4 +1,4 @@
-package MyApp.BE.service.Conversation;
+package MyApp.BE.service.conversation;
 
 import MyApp.BE.dto.ConversationDTO;
 import MyApp.BE.dto.MessageDTO;
@@ -55,7 +55,7 @@ public class ConversationService {
     private ConversationDTO createConversationDTO(MessageEntity message, Long currentUserId) {
         ConversationDTO conversation = new ConversationDTO();
         conversation.setConversationId(message.getConversationId());
-        
+
         // Determine who is the "other" user in conversation
         UserEntity otherUser;
         if (message.getMsgSender().getUserId().equals(currentUserId)) {
@@ -63,7 +63,7 @@ public class ConversationService {
         } else {
             otherUser = message.getMsgSender();
         }
-        
+
         conversation.setOtherUserId(otherUser.getUserId());
         conversation.setOtherUserNickName(otherUser.getNickName());
         conversation.setOtherUserProfilePicture(getProfilePictureUrl(otherUser));
@@ -71,7 +71,7 @@ public class ConversationService {
         conversation.setLastMessageTime(message.getTimeStamp());
         conversation.setUnreadCount(getUnreadCount(message.getConversationId(), currentUserId));
         conversation.setOnline(false); // TODO: Implement online status
-        
+
         return conversation;
     }
 
@@ -79,8 +79,8 @@ public class ConversationService {
      * Get profile picture URL for user
      */
     private String getProfilePictureUrl(UserEntity user) {
-        if (user.getUserProfileEntity() != null && 
-            user.getUserProfileEntity().getProfilePictureUrl() != null) {
+        if (user.getUserProfileEntity() != null &&
+                user.getUserProfileEntity().getProfilePictureUrl() != null) {
             return user.getUserProfileEntity().getProfilePictureUrl();
         }
         return null;

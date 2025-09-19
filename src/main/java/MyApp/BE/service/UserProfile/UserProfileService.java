@@ -1,6 +1,5 @@
 package MyApp.BE.service.UserProfile;
 
-import MyApp.BE.dto.ErrorDTO;
 import MyApp.BE.dto.UserProfileDTO;
 import MyApp.BE.dto.UserProfilePrivateDTO;
 import MyApp.BE.dto.mapper.UserMapper;

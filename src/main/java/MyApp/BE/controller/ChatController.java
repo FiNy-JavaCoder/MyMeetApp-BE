@@ -3,7 +3,7 @@ package MyApp.BE.controller;
 import MyApp.BE.dto.ConversationSummaryDTO;
 import MyApp.BE.dto.ErrorDTO;
 import MyApp.BE.dto.MessageDTO;
-import MyApp.BE.service.ChatService;
+import MyApp.BE.service.chat.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,6 +18,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.Map;
 @Tag(name = "Chat", description = "Chat messaging endpoints")
 public class ChatController {
 
+    @Autowired
     private final ChatService chatService;
 
     @PostMapping("/send")
