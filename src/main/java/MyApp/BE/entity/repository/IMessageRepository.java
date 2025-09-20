@@ -118,6 +118,7 @@ public interface IMessageRepository extends JpaRepository<MessageEntity, Long> {
     int markMessagesAsReadInConversation(@Param("conversationId") String conversationId, 
                                        @Param("userId") Long userId);
 
+
     /**
      * Find paginated messages for conversation
      */
@@ -128,4 +129,16 @@ public interface IMessageRepository extends JpaRepository<MessageEntity, Long> {
     Page<MessageEntity> findByConversationIdAndUserIdPaged(@Param("conversationId") String conversationId,
                                                           @Param("userId") Long userId,
                                                           Pageable pageable);
+
+
+    /**
+     * Find latest message in each conversation for a user
+     */
+    @Query("SELECT m FROM MessageEntity m WHERE m.messageId IN (" +
+           "SELECT MAX(m2.messageId) FROM MessageEntity m2 WHERE " +
+           "(m2.msgSender.userId = :userId OR m2.msgRecipient.userId = :userId) " +
+           "GROUP BY m2.conversationId) " +
+           "ORDER BY m.timeStamp DESC")
+    List<MessageEntity> findLatestMessagesByUserId(@Param("userId") Long userId);
+
 }
