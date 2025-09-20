@@ -6,25 +6,22 @@ import MyApp.BE.service.message.MessageService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"})
+@RequiredArgsConstructor
+@Slf4j
 public class MessageController {
 
-    @Autowired
     private final MessageService messageService;
-
-    public MessageController(MessageService messageService) {
-        this.messageService = messageService;
-    }
 
     /**
      * Get all messages in a conversation
@@ -35,9 +32,11 @@ public class MessageController {
             List<MessageDTO> messages = messageService.getConversationById(conversationId);
             return ResponseEntity.ok(messages);
         } catch (IllegalArgumentException e) {
+            log.warn("Invalid conversation ID: {}", conversationId, e);
             return ResponseEntity.badRequest()
                     .body(new ErrorDTO("Neplatné ID konverzace: " + e.getMessage()));
         } catch (Exception e) {
+            log.error("Error loading conversation: {}", conversationId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se načíst konverzaci: " + e.getMessage()));
         }
@@ -51,9 +50,11 @@ public class MessageController {
         try {
             return messageService.createMessage(messageDTO);
         } catch (IllegalArgumentException e) {
+            log.warn("Invalid message: {}", e.getMessage());
             return ResponseEntity.badRequest()
                     .body(new ErrorDTO("Neplatná zpráva: " + e.getMessage()));
         } catch (Exception e) {
+            log.error("Error sending message", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se odeslat zprávu: " + e.getMessage()));
         }
@@ -68,9 +69,11 @@ public class MessageController {
             List<String> conversationIds = messageService.getUserConversationIds(userId);
             return ResponseEntity.ok(conversationIds);
         } catch (IllegalArgumentException e) {
+            log.warn("Invalid user ID: {}", userId, e);
             return ResponseEntity.badRequest()
                     .body(new ErrorDTO("Neplatné ID uživatele: " + e.getMessage()));
         } catch (Exception e) {
+            log.error("Error loading conversations for user: {}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se načíst konverzace: " + e.getMessage()));
         }
@@ -86,9 +89,11 @@ public class MessageController {
             boolean exists = messageService.conversationExists(userId1, userId2);
             return ResponseEntity.ok(exists);
         } catch (IllegalArgumentException e) {
+            log.warn("Invalid user IDs: {} and {}", userId1, userId2, e);
             return ResponseEntity.badRequest()
                     .body(new ErrorDTO("Neplatné ID uživatelů: " + e.getMessage()));
         } catch (Exception e) {
+            log.error("Error checking conversation existence", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se ověřit konverzaci: " + e.getMessage()));
         }
@@ -103,6 +108,7 @@ public class MessageController {
             long count = messageService.getMessageCount(conversationId);
             return ResponseEntity.ok(count);
         } catch (Exception e) {
+            log.error("Error getting message count for conversation: {}", conversationId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se načíst počet zpráv: " + e.getMessage()));
         }
@@ -117,6 +123,7 @@ public class MessageController {
             messageService.deleteConversation(conversationId);
             return ResponseEntity.ok("Konverzace byla smazána");
         } catch (Exception e) {
+            log.error("Error deleting conversation: {}", conversationId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se smazat konverzaci: " + e.getMessage()));
         }
@@ -134,9 +141,11 @@ public class MessageController {
             List<MessageDTO> messages = messageService.getConversationMessages(conversationId, page, size);
             return ResponseEntity.ok(messages);
         } catch (IllegalArgumentException e) {
+            log.warn("Invalid parameters for conversation messages", e);
             return ResponseEntity.badRequest()
                     .body(new ErrorDTO("Neplatné parametry: " + e.getMessage()));
         } catch (Exception e) {
+            log.error("Error getting conversation messages", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorDTO("Nepodařilo se načíst zprávy: " + e.getMessage()));
         }
